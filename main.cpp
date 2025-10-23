@@ -3,10 +3,17 @@
 
 int main(int argc, char** argv) {
     
-    if (argc != 3) {
-        throw Exceptions::ExceptionParams();
+    try
+    {
+        if (argc != 3)
+            throw Exceptions::ExceptionParams();
+
+        (void)argv;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
         return 1;
     }
-    (void)argv;
     return 0;
 }
