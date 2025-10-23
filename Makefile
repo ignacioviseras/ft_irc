@@ -2,8 +2,8 @@ NAME = ircserv
 CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 SRCS =	main.cpp \
-		ircserv.cpp \
-		exceptions.cpp \
+		Exceptions.cpp \
+		Ircserv.cpp \
 		
 OBJS = $(SRCS:.cpp=.o)
 
