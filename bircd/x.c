@@ -7,7 +7,7 @@
 
 int	x_int(int err, int res, char *str, char *file, int line)
 {
-  if (res == err)
+  if (res == err)  
     {
       fprintf(stderr, "%s error (%s, %d): %s\n", 
 	      str, file, line, strerror(errno));
