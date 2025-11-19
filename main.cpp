@@ -24,11 +24,12 @@ bool parse_commands(std::string input)
     //     std::cout << "PARTE " << i << " : " << splitted_input[i] << std::endl;
     if (splitted_input[0] != "KICK" && splitted_input[0] != "INVITE" && splitted_input[0] != "TOPIC" && splitted_input[0] != "MODE")
     {
-        std::cout << splitted_input[0] << "no es un comando. Prueba con KICK, INVITE, TOPIC o MODE" << std::endl;
+        std::cout << splitted_input[0] << " no es un comando. Prueba con KICK, INVITE, TOPIC o MODE" << std::endl;
         return false;
     }
     std::cout << splitted_input[0] << "fue valido" << std::endl;
     int token_size = splitted_input.size();
+    //esta comprobacion es 
     if (token_size > 4)
         return (false);
     return (true);
@@ -66,8 +67,6 @@ int main(int argc, char** argv) {
     Ircserv *server;
     try
     {
-//        if (argc == 2)
-//           throw Exceptions::ExceptionTest();
         if (argc != 3)
             throw Exceptions::ExceptionParams();
         if (!valid_server_port(argv[1]))
@@ -78,7 +77,7 @@ int main(int argc, char** argv) {
         std::cout << "DI AMIGO Y ENTRA (O CUALQUIER COSA) Y EXIT PARA SALIR: " << input << std::endl;
         while (input != "EXIT")
         {
-           std::getline(std::cin, input); 
+            std::getline(std::cin, input); 
             std::cout << "INPUT INTRODUCIDO: " << input << std::endl;
             if (input.empty() || !parse_commands(input))
             {
