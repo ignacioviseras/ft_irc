@@ -12,8 +12,10 @@ Server::~Server() {
 void Server::setupServerSocket()
 {
     _serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (_serverSocket < 0) {
-        perror("socket()");
+    // os sockets sean no bloqueantes
+    //Si un recv o un send se bloquea congelas todo el servidor para todos los usuarios
+    if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) < 0) {
+        perror("fcntl()");
         exit(1);
     }
 
@@ -61,6 +63,7 @@ void Server::handleStdin() {
         return;
     }
     Token token_test(token_assign_type(split(input, " ")[0]), split(input, " "));
+    // executeCommand(token);
     std::cout << "TOKEN GENERADO - Tipo: " << token_test.getType() << std::endl;
 }
 
@@ -68,7 +71,7 @@ void Server::run()
 {
     while (_running)
     {
-        int activity = poll(_pollfds.data(), _pollfds.size(), -1);
+        int activity = poll(&_pollfds[0], _pollfds.size(), -1);
         if (activity < 0) {
             perror("poll()");
             exit(1);
@@ -92,13 +95,15 @@ void Server::handleNewConnection() {
     socklen_t addrSize = sizeof(clientAddr);
 
     int clientFd = accept(_serverSocket, (sockaddr *)&clientAddr, &addrSize);
-    if (clientFd < 0) {
-        perror("accept()");
+    // os sockets sean no bloqueantes
+    //Si un recv o un send se bloquea congelas todo el servidor para todos los usuarios
+    if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
+        perror("fcntl()");
+        close(clientFd);
         return;
     }
 
     std::cout << "Cliente conectado! FD = " << clientFd << std::endl;
-
     _clients.insert(std::make_pair(clientFd, Client(clientFd)));
 
     pollfd clientPoll;
@@ -109,13 +114,13 @@ void Server::handleNewConnection() {
 
 void Server::handleClientData(int fd) {
     char buffer[1024];
+    std::memset(buffer, 0, sizeof(buffer));
     ssize_t bytesRead = recv(fd, buffer, sizeof(buffer) - 1, 0);
 
     if (bytesRead <= 0) {
         std::cout << "Cliente desconectado FD = " << fd << std::endl;
         close(fd);
         _clients.erase(fd);
-
         for (size_t i = 0; i < _pollfds.size(); ++i) {
             if (_pollfds[i].fd == fd) {
                 _pollfds.erase(_pollfds.begin() + i);
@@ -127,6 +132,25 @@ void Server::handleClientData(int fd) {
 
     buffer[bytesRead] = '\0';
     std::string msg(buffer);
-
-    std::cout << "FD " << fd << ": '" << msg << "'";
+    std::cout << "fd " << fd << ": '" << msg << "'";
 }
+
+// void Server::executeCommand(const Token& token) {
+//     switch (token.getType()) {
+//         case Token::KICK:
+//             std::cout << "Ejecutando lógica de KICK..." << std::endl;
+//             // Aquí llamarías a: _kickUser(token.getArgs()...);
+//             break;
+//         case Token::INVITE:
+//             std::cout << "Ejecutando lógica de INVITE..." << std::endl;
+//             break;
+//         case Token::TOPIC:
+//             std::cout << "Ejecutando lógica de TOPIC..." << std::endl;
+//             break;
+//         case Token::MODE:
+//             std::cout << "Ejecutando lógica de MODE..." << std::endl;
+//             break;
+//         default:
+//             std::cout << "Comando desconocido" << std::endl;
+//     }
+// }

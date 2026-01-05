@@ -1,8 +1,9 @@
 #ifndef TOKEN_HPP
 # define TOKEN_HPP
 
-# include "Server.hpp"
 # include <vector>
+# include <string>
+# include <iostream>
 
 class Token
 {
@@ -14,7 +15,16 @@ class Token
             KICK,
             INVITE,
             TOPIC,
-            MODE 
+            MODE,
+
+            // PASS,
+            // NICK,
+            // USER,
+            // JOIN,
+
+            // PRIVMSG, // para mensajes
+            // PING,    //ara no se desconectar al cliente
+            // UNKNOWN //se puede usar por si no existe y asi se tramita
         };
 
         Token();
