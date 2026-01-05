@@ -1,10 +1,17 @@
 NAME = ircserv
-CXX = g++
+CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 SRCS =	main.cpp \
 		Exceptions.cpp \
-		Ircserv.cpp \
-		Token.cpp
+		Server.cpp \
+		Token.cpp \
+		Utils.cpp \
+		Client.cpp\
+# 		\
+# 		\
+# 		\
+# 		\
+# 		\
 
 OBJS = $(SRCS:.cpp=.o)
 

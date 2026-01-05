@@ -1,0 +1,57 @@
+#include "Utils.hpp"
+
+//split guarro joseado para salir del paso
+std::vector<std::string> split(const std::string& s, const std::string& delimiter) {
+    std::vector<std::string> tokens;
+    size_t start = 0, end, delim_len = delimiter.length();
+    while ((end = s.find(delimiter, start)) != std::string::npos) {
+        tokens.push_back(s.substr(start, end - start));
+        start = end + delim_len;
+    }
+    tokens.push_back(s.substr(start));
+    return tokens;
+}
+
+bool parse_commands(const std::string& input)
+{
+    std::vector<std::string> splitted_input = split(input, " ");
+    // for (size_t i = 0; i < splitted_input.size(); ++i)
+    //     std::cout << "PARTE " << i << " : " << splitted_input[i] << std::endl;
+    if (splitted_input[0] != "KICK" && splitted_input[0] != "INVITE" && splitted_input[0] != "TOPIC" && splitted_input[0] != "MODE")
+    {
+        std::cout << splitted_input[0] << " no es un comando. Prueba con KICK, INVITE, TOPIC o MODE" << std::endl;
+        return false;
+    }
+    std::cout << splitted_input[0] << " fue valido" << std::endl;
+    int token_size = splitted_input.size();
+    //esta comprobacion es 
+    if (token_size > 4)
+        return (false);
+    return (true);
+}
+
+bool valid_server_port(const char *arg)
+{
+    unsigned int num;
+    for (size_t i = 0; i < std::strlen(arg); i++)
+    {
+        if (!isdigit(arg[i]))
+            return (false);
+    }
+    num = std::atoi(arg);
+    if (num > 65535)
+        return (false);
+    return (true);
+}
+
+Token::type token_assign_type(const std::string& arg)
+{
+    if (arg == "KICK")
+        return (Token::KICK);
+    else if (arg == "INVITE")
+        return (Token::INVITE);
+    else if (arg == "TOPIC")
+        return (Token::TOPIC);
+    else
+        return (Token::MODE);
+}

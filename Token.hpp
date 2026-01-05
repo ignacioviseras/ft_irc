@@ -1,7 +1,8 @@
 #ifndef TOKEN_HPP
 # define TOKEN_HPP
 
-# include "Ircserv.hpp"
+# include "Server.hpp"
+# include <vector>
 
 class Token
 {
