@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include "Utils.hpp"
-
+#include <fcntl.h>
 class Server
 {
     private:
@@ -30,8 +30,12 @@ class Server
         void handleNewConnection();
         void handleClientData(int fd);
         void handleStdin();
+        bool parse(const std::string& commandLine, std::vector<std::string>& args);
+        void handleCommand(int fd, std::string& commandLine);
+        void executeCommand(int fd, const std::vector<std::string>& args);
+        bool nicknameInUse(const std::string& nick);
     public:
-        Server(int port, const std::string &pass);
+        Server(int port, const std::string &password);
         ~Server();
         void run();
 

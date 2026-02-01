@@ -14,19 +14,25 @@ std::vector<std::string> split(const std::string& s, const std::string& delimite
 
 bool parse_commands(const std::string& input)
 {
-    std::vector<std::string> splitted_input = split(input, " ");
+    // std::vector<std::string> splitted_input = split(input, " ");
     // for (size_t i = 0; i < splitted_input.size(); ++i)
     //     std::cout << "PARTE " << i << " : " << splitted_input[i] << std::endl;
-    if (splitted_input[0] != "KICK" && splitted_input[0] != "INVITE" && splitted_input[0] != "TOPIC" && splitted_input[0] != "MODE")
-    {
-        std::cout << splitted_input[0] << " no es un comando. Prueba con KICK, INVITE, TOPIC o MODE" << std::endl;
+    // if (splitted_input[0] != "KICK" && splitted_input[0] != "INVITE" && splitted_input[0] != "TOPIC" && splitted_input[0] != "MODE")
+    // {
+    //     std::cout << splitted_input[0] << " no es un comando. Prueba con KICK, INVITE, TOPIC o MODE" << std::endl;
+    //     return false;
+    // }
+    // std::cout << splitted_input[0] << " fue valido" << std::endl;
+    if (input.empty())
+        return (false);
+    if (input.length() > 512) { // IRC suele limitar a 512
+        std::cout << "Error: Comando demasiado largo." << std::endl;
         return false;
     }
-    std::cout << splitted_input[0] << " fue valido" << std::endl;
-    int token_size = splitted_input.size();
-    //esta comprobacion es 
-    if (token_size > 4)
-        return (false);
+    // int token_size = splitted_input.size();
+    // //esta comprobacion es 
+    // if (token_size > 4)
+    //     return (false);
     return (true);
 }
 
@@ -52,6 +58,18 @@ Token::type token_assign_type(const std::string& arg)
         return (Token::INVITE);
     else if (arg == "TOPIC")
         return (Token::TOPIC);
-    else
+    else if (arg == "MODE")
         return (Token::MODE);
+    else if (arg == "PASS")
+        return (Token::PASS);
+    else if (arg == "NICK")
+        return (Token::NICK);
+    else if (arg == "USER")
+        return (Token::USER);
+    else if (arg == "JOIN")
+        return (Token::JOIN);
+    else if (arg == "PRIVMSG")
+        return (Token::PRIVMSG);
+    else
+        return (Token::UNKNOWN);
 }

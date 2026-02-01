@@ -115,8 +115,9 @@ void Server::handleNewConnection() {
 void Server::handleClientData(int fd) {
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
+    
+    // leemos del sckoet
     ssize_t bytesRead = recv(fd, buffer, sizeof(buffer) - 1, 0);
-
     if (bytesRead <= 0) {
         std::cout << "Cliente desconectado FD = " << fd << std::endl;
         close(fd);
@@ -129,28 +130,159 @@ void Server::handleClientData(int fd) {
         }
         return;
     }
+    _clients[fd].getBuffer().append(buffer, bytesRead);// acumulamos los datos
 
-    buffer[bytesRead] = '\0';
-    std::string msg(buffer);
-    std::cout << "fd " << fd << ": '" << msg << "'";
+    // tramitamos el buffer -> \n
+    std::string &clientBuff = _clients[fd].getBuffer();
+    size_t pos = 0;
+    while ((pos = clientBuff.find('\n')) != std::string::npos) {
+        std::string commandLine = clientBuff.substr(0, pos);// extraemos el comando (como un gnl)
+        if (!commandLine.empty() && commandLine[commandLine.length() - 1] == '\r')// irc usa \r\n quitamos los \r
+            commandLine.erase(commandLine.length() - 1);
+
+        if (!commandLine.empty()) {
+            std::cout << "fd: " << fd << ": " << commandLine << std::endl;
+            handleCommand(fd, commandLine);
+        }
+        clientBuff.erase(0, pos + 1);//borramos lo procesado para no tener un bucle q leemos lo mismo (como en el gnl)
+    }
+    // Lo que sobre (si no hay \n) se queda en clientBuff esperando al siguiente
 }
 
-// void Server::executeCommand(const Token& token) {
-//     switch (token.getType()) {
-//         case Token::KICK:
-//             std::cout << "Ejecutando lógica de KICK..." << std::endl;
-//             // Aquí llamarías a: _kickUser(token.getArgs()...);
-//             break;
-//         case Token::INVITE:
-//             std::cout << "Ejecutando lógica de INVITE..." << std::endl;
-//             break;
-//         case Token::TOPIC:
-//             std::cout << "Ejecutando lógica de TOPIC..." << std::endl;
-//             break;
-//         case Token::MODE:
-//             std::cout << "Ejecutando lógica de MODE..." << std::endl;
-//             break;
-//         default:
-//             std::cout << "Comando desconocido" << std::endl;
-//     }
-// }
+bool Server::parse(const std::string& commandLine, std::vector<std::string>& args) {
+    if (!parse_commands(commandLine))
+        return false;
+    std::vector<std::string> rawArgs = split(commandLine, " ");
+    for (size_t i = 0; i < rawArgs.size(); ++i) {
+        if (!rawArgs[i].empty())
+            args.push_back(rawArgs[i]);
+    }
+    if (args.empty())
+        return false;
+
+    return true;
+}
+
+
+void Server::handleCommand(int fd, std::string& commandLine) {
+    std::vector<std::string> args;
+    if (!parse(commandLine, args))
+        return;
+    executeCommand(fd, args);
+}
+
+bool Server::nicknameInUse(const std::string& nick) {
+    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        if (it->second.getNickname() == nick) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Server::executeCommand(int fd, const std::vector<std::string>& args) {
+    Token::type cmdType = token_assign_type(args[0]);
+
+    Client& user = _clients[fd];
+    if (!user._isPasswordOk && cmdType != Token::PASS) {
+        std::cerr << "Para autenticarse pruevbe PASS <passwd>"<< std::endl;
+        return; 
+    }
+    if (user._isPasswordOk && !user.isRegisted() && 
+    cmdType != Token::NICK && cmdType != Token::USER && cmdType != Token::PASS) {
+        std::cerr << "Error: Completa tu registro con NICK y USER." << std::endl;
+        return;
+    }
+    switch (cmdType) {
+        //--------- KICK -----------
+        case Token::KICK:
+            std::cout << "Ejecutando lógica de KICK..." << std::endl;
+            if (args.size() < 2) {
+                std::cerr << "Error: NICK necesita un argumento." << std::endl;
+                return;
+            }
+            //execution kick
+            break;
+        //--------- INVITE -----------
+        case Token::INVITE:
+            std::cout << "Ejecutando lógica de INVITE..." << std::endl;
+            break;
+        //--------- TOPIC -----------
+        case Token::TOPIC:
+            std::cout << "Ejecutando lógica de TOPIC..." << std::endl;
+            break;
+        //--------- MODE -----------
+        case Token::MODE:
+            std::cout << "Ejecutando lógica de MODE..." << std::endl;
+            break;
+        //--------- PASS -----------
+        case Token::PASS:{
+            if (args.size() < 2) {
+                std::cerr << "Error: PASS necesita la contraseña." << std::endl;
+                return;
+            }
+            if (user.isRegisted())
+                break;
+            if (args[1] == this->_password) {
+                user._isPasswordOk = true;
+                std::cout << "fd: " << fd << " passwd okey" << std::endl;
+            } else 
+                std::cout << "fd: " << fd << " error passwd" << std::endl;
+            break;
+        }
+        //--------- NICK -----------
+        case Token::NICK: {
+            if (args.size() < 2) {
+                std::cerr << "Error: NICK necesita el nickname 'NICK <nickname>'" << std::endl;
+                return;
+            }
+            std::string nickName = args[1];
+            if (nickName.empty() || nicknameInUse(nickName)) {
+                std::cout << "fd: " << fd << " error in setnickname" << std::endl;
+                return;
+            } else{
+                user.setNickname(nickName);
+                std::cout << "fd: " << fd << " setnickname '"<< nickName <<"' okey" << std::endl;
+                if (user._isPasswordOk && !user.getUsername().empty() && !user.getNickname().empty() && !user.isRegisted()) {
+                    user.setRegisted(true);
+                    std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE: " << nickName << " ---" << std::endl;
+                }
+                return;
+            } 
+            break;
+        }
+        //--------- USER -----------
+        case Token::USER:{
+            if (args.size() < 5) { // USER <username> <hostname> <servername> <realname>
+                std::cerr << "Error: USER necesita 4 argumentos <username> <hostname> <servername> <realname>" << std::endl;
+                return;
+            }
+            if (user.isRegisted()) {
+                 std::cerr << "Error: Ya estás registrado" << std::endl;
+                 return;
+            }
+            user.setUsername(args[1]);
+            // hostname y servername se suelen ignorar o guardar por log
+            // creo q solo tengo q guardar el args[1] -> username PREGUNTAR
+            std::cout << "fd: " << fd << " Username establecido a: " << args[1] << std::endl;
+            if (user._isPasswordOk && !user.getNickname().empty() && !user.getUsername().empty()) {
+                user.setRegisted(true);
+                std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE ---" << std::endl;
+            }
+            break;
+        }
+        //--------- JOIN -----------
+        case Token::JOIN:
+            std::cout << "Ejecutando lógica de JOIN..." << std::endl;
+            break;
+        //--------- PRIVMSG -----------
+        case Token::PRIVMSG:
+            std::cout << "Ejecutando lógica de PRIVMSG..." << std::endl;
+            break;
+        case Token::UNKNOWN:
+        default:
+            std::cerr << "Comando desconocido: " << args[0] << std::endl;
+            break;
+    }
+}
+
