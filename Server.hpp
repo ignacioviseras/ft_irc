@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include "Utils.hpp"
+#include "Channel.hpp"
 
 class Server
 {
@@ -30,9 +31,11 @@ class Server
         void handleNewConnection();
         void handleClientData(int fd);
         void handleStdin();
+
+		void _kickUser(Client* sender, const std::vector<std::string>& args);
     public:
         Server(int port, const std::string &pass);
         ~Server();
         void run();
 
-};   
+};

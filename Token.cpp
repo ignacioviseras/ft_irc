@@ -50,5 +50,3 @@ Token::type Token::getType() const {
 void Token::setType(type t) {
     _type = t;
 }
-
-
