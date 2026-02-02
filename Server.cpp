@@ -180,17 +180,24 @@ bool Server::nicknameInUse(const std::string& nick) {
     return false;
 }
 
+void Server::send_message(int fd, std::string message) {
+    std::string full_message = message + "\r\n";
+    if (send(fd, full_message.c_str(), full_message.length(), 0) == -1) {
+        std::cerr << "Error enviando mensaje al fd: " << fd << std::endl;
+    }
+}
+
 void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     Token::type cmdType = token_assign_type(args[0]);
 
     Client& user = _clients[fd];
     if (!user._isPasswordOk && cmdType != Token::PASS) {
-        std::cerr << "Para autenticarse pruevbe PASS <passwd>"<< std::endl;
+        send_message(fd, "Para autenticarse pruevbe PASS <passwd>");
         return; 
     }
     if (user._isPasswordOk && !user.isRegisted() && 
     cmdType != Token::NICK && cmdType != Token::USER && cmdType != Token::PASS) {
-        std::cerr << "Error: Completa tu registro con NICK y USER." << std::endl;
+        send_message(fd, "Error: Completa tu registro con NICK y USER.");
         return;
     }
     switch (cmdType) {
@@ -198,7 +205,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         case Token::KICK:
             std::cout << "Ejecutando lógica de KICK..." << std::endl;
             if (args.size() < 2) {
-                std::cerr << "Error: NICK necesita un argumento." << std::endl;
+                send_message(fd, "Error: KICK necesita un argumento.");
                 return;
             }
             //execution kick
@@ -218,22 +225,22 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         //--------- PASS -----------
         case Token::PASS:{
             if (args.size() < 2) {
-                std::cerr << "Error: PASS necesita la contraseña." << std::endl;
+                send_message(fd, "Error: PASS necesita la contraseña.");
                 return;
             }
             if (user.isRegisted())
                 break;
             if (args[1] == this->_password) {
                 user._isPasswordOk = true;
-                std::cout << "fd: " << fd << " passwd okey" << std::endl;
+                send_message(fd, "password okey");
             } else 
-                std::cout << "fd: " << fd << " error passwd" << std::endl;
+                send_message(fd, "Error: password");
             break;
         }
         //--------- NICK -----------
         case Token::NICK: {
             if (args.size() < 2) {
-                std::cerr << "Error: NICK necesita el nickname 'NICK <nickname>'" << std::endl;
+                send_message(fd, "Error: NICK necesita el nickname 'NICK <nickname>'");
                 return;
             }
             std::string nickName = args[1];
@@ -246,6 +253,8 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
                 if (user._isPasswordOk && !user.getUsername().empty() && !user.getNickname().empty() && !user.isRegisted()) {
                     user.setRegisted(true);
                     std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE: " << nickName << " ---" << std::endl;
+                    std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network";//no se como poner los logs tanto en serv oomo ern clinent
+                    send_message(fd, welcome);
                 }
                 return;
             } 
@@ -254,12 +263,12 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         //--------- USER -----------
         case Token::USER:{
             if (args.size() < 5) { // USER <username> <hostname> <servername> <realname>
-                std::cerr << "Error: USER necesita 4 argumentos <username> <hostname> <servername> <realname>" << std::endl;
+                send_message(fd, "Error: USER necesita 4 argumentos <username> <hostname> <servername> <realname>");
                 return;
             }
             if (user.isRegisted()) {
-                 std::cerr << "Error: Ya estás registrado" << std::endl;
-                 return;
+                send_message(fd, "Error: Ya estás registrado");
+                return;
             }
             user.setUsername(args[1]);
             // hostname y servername se suelen ignorar o guardar por log
@@ -268,6 +277,8 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             if (user._isPasswordOk && !user.getNickname().empty() && !user.getUsername().empty()) {
                 user.setRegisted(true);
                 std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE ---" << std::endl;
+                std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network";//no se como poner los logs tanto en serv oomo ern clinent
+                send_message(fd, welcome);
             }
             break;
         }
