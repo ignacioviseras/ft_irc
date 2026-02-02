@@ -35,6 +35,8 @@ class Server
         void executeCommand(int fd, const std::vector<std::string>& args);
         bool nicknameInUse(const std::string& nick);
         void send_message(int fd, std::string message);
+        void checkRegistration(int fd, Client &user);
+
 
     public:
         Server(int port, const std::string &password);

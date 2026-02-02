@@ -186,6 +186,14 @@ void Server::send_message(int fd, std::string message) {
         std::cerr << "Error enviando mensaje al fd: " << fd << std::endl;
     }
 }
+void Server::checkRegistration(int fd, Client &user) {
+    if (user._isPasswordOk && !user.getUsername().empty() && !user.getNickname().empty() && !user.isRegisted()) {
+        user.setRegisted(true);
+        std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE: " << user.getNickname() << " ---" << std::endl;
+        std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network";//no se como poner los logs tanto en serv oomo ern clinent
+        send_message(fd, welcome);
+    }
+}
 
 void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     Token::type cmdType = token_assign_type(args[0]);
@@ -250,12 +258,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             } else{
                 user.setNickname(nickName);
                 std::cout << "fd: " << fd << " setnickname '"<< nickName <<"' okey" << std::endl;
-                if (user._isPasswordOk && !user.getUsername().empty() && !user.getNickname().empty() && !user.isRegisted()) {
-                    user.setRegisted(true);
-                    std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE: " << nickName << " ---" << std::endl;
-                    std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network";//no se como poner los logs tanto en serv oomo ern clinent
-                    send_message(fd, welcome);
-                }
+                checkRegistration(fd, user);
                 return;
             } 
             break;
@@ -274,12 +277,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             // hostname y servername se suelen ignorar o guardar por log
             // creo q solo tengo q guardar el args[1] -> username PREGUNTAR
             std::cout << "fd: " << fd << " Username establecido a: " << args[1] << std::endl;
-            if (user._isPasswordOk && !user.getNickname().empty() && !user.getUsername().empty()) {
-                user.setRegisted(true);
-                std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE ---" << std::endl;
-                std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network";//no se como poner los logs tanto en serv oomo ern clinent
-                send_message(fd, welcome);
-            }
+            checkRegistration(fd, user);
             break;
         }
         //--------- JOIN -----------
