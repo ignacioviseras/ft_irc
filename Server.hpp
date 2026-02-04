@@ -15,7 +15,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include "Utils.hpp"
-#include <fcntl.h>#include "Channel.hpp"
+#include <fcntl.h>
+#include "Channel.hpp"
 
 class Server
 {
@@ -37,11 +38,9 @@ class Server
         bool nicknameInUse(const std::string& nick);
         void send_message(int fd, std::string message);
         void checkRegistration(int fd, Client &user);
-
-
-
 		void _kickUser(Client* sender, const std::vector<std::string>& args);
-    public:
+
+	public:
         Server(int port, const std::string &password);
         ~Server();
         void run();

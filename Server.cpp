@@ -108,9 +108,12 @@ void Server::handleStdin() {
     if (!parse_commands(input)) {
         return;
     }
-    Token token_test(token_assign_type(split(input, " ")[0]), split(input, " "));
-    executeCommand(token);
-    std::cout << "TOKEN GENERADO - Tipo: " << token_test.getType() << std::endl;
+	std::vector<std::string> args;
+	if (!parse(input, args)) {
+    	executeCommand(STDIN_FILENO, args);
+	}
+    //Token token_test(token_assign_type(split(input, " ")[0]), split(input, " "));
+    //std::cout << "TOKEN GENERADO - Tipo: " << token_test.getType() << std::endl;
 }
 
 void Server::handleClientData(int fd) {
@@ -164,7 +167,6 @@ bool Server::parse(const std::string& commandLine, std::vector<std::string>& arg
     return true;
 }
 
-
 void Server::handleCommand(int fd, std::string& commandLine) {
     std::vector<std::string> args;
     if (!parse(commandLine, args))
@@ -191,7 +193,7 @@ void Server::checkRegistration(int fd, Client &user) {
     if (user._isPasswordOk && !user.getUsername().empty() && !user.getNickname().empty() && !user.isRegisted()) {
         user.setRegisted(true);
         std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE: " << user.getNickname() << " ---" << std::endl;
-        std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network";//no se como poner los logs tanto en serv oomo ern clinent
+        std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network";//no se como poner los logs tanto en serv como en clinent
         send_message(fd, welcome);
     }
 }
@@ -201,7 +203,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 
     Client& user = _clients[fd];
     if (!user._isPasswordOk && cmdType != Token::PASS) {
-        send_message(fd, "Para autenticarse pruevbe PASS <passwd>");
+        send_message(fd, "Para autenticarse pruebe PASS <passwd>");
         return; 
     }
     if (user._isPasswordOk && !user.isRegisted() && 
@@ -217,6 +219,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
                 send_message(fd, "Error: KICK necesita un argumento.");
                 return;
             }
+			_kickUser(&user, args);
             //execution kick
             break;
         //--------- INVITE -----------
@@ -296,3 +299,31 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     }
 }
 
+void Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
+	if (args.size() < 2) {
+		send_message(sender->getFd(), "Error: KICK necesita un argumento.");
+		return;
+	}
+	std::string targetNick = args[1];
+	int targetFd = -1;
+	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if (it->second.getNickname() == targetNick) {
+			targetFd = it->first;
+			break;
+		}
+	}
+	if (targetFd == -1) {
+		send_message(sender->getFd(), "Error: Usuario no encontrado.");
+		return;
+	}
+	send_message(targetFd, "Has sido expulsado por " + sender->getNickname());
+	send_message(sender->getFd(), "Usuario " + targetNick + " expulsado correctamente.");
+	close(targetFd);
+	_clients.erase(targetFd);
+	for (size_t i = 0; i < _pollfds.size(); ++i) {
+		if (_pollfds[i].fd == targetFd) {
+			_pollfds.erase(_pollfds.begin() + i);
+			break;
+		}
+	}
+}
