@@ -22,6 +22,8 @@ class Channel {
 	    void setOperator(Client* client, bool op);
 	    const std::string& getName() const;
 	    const std::set<Client*>& getUsers() const;
+
+		void sendToChannel(Channel& channel, const std::string& message, Client* exclude);
 };
 
 #endif

@@ -26,6 +26,7 @@ class Server
         bool _running;
         int _serverSocket;
         std::map<int, Client> _clients;
+		std::map<std::string, Channel> _channels;
         std::vector<pollfd> _pollfds;
 
         void setupServerSocket();
@@ -38,11 +39,13 @@ class Server
         bool nicknameInUse(const std::string& nick);
         void send_message(int fd, std::string message);
         void checkRegistration(int fd, Client &user);
+
 		void _kickUser(Client* sender, const std::vector<std::string>& args);
+		Client* findClientByNick(const std::string& nick);
+		void sendToChannel(const Channel& channel, const std::string& msg);
 
 	public:
         Server(int port, const std::string &password);
         ~Server();
         void run();
-
 };

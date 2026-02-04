@@ -37,4 +37,3 @@ const std::string& Channel::getName() const {
 const std::set<Client*>& Channel::getUsers() const {
     return _users;
 }
-

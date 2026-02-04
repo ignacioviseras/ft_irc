@@ -214,13 +214,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     switch (cmdType) {
         //--------- KICK -----------
         case Token::KICK:
-            std::cout << "Ejecutando lógica de KICK..." << std::endl;
-            if (args.size() < 2) {
-                send_message(fd, "Error: KICK necesita un argumento.");
-                return;
-            }
 			_kickUser(&user, args);
-            //execution kick
             break;
         //--------- INVITE -----------
         case Token::INVITE:
@@ -285,9 +279,31 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             break;
         }
         //--------- JOIN -----------
-        case Token::JOIN:
-            std::cout << "Ejecutando lógica de JOIN..." << std::endl;
+        case Token::JOIN: {
+            if (args.size() < 2) {
+                send_message(fd, "Error: JOIN necesita un nombre de canal.");
+                return;
+            }
+            std::string chanName = args[1];
+            std::map<std::string, Channel>::iterator it = _channels.find(chanName);
+            if (it == _channels.end()) {
+                _channels.insert(std::make_pair(chanName, Channel(chanName)));
+                it = _channels.find(chanName);
+            }
+            Channel& channel = it->second;
+            if (channel.hasUser(&user)) {
+                send_message(fd, "Error: Ya estás en el canal " + chanName);
+                return;
+            }
+            channel.addUser(&user);
+            if (channel.getUsers().size() == 1) {
+                channel.setOperator(&user, true);
+            }
+            std::string joinMsg = user.getNickname() + " se unió al canal " + chanName;
+            sendToChannel(channel, joinMsg);
+            send_message(fd, "Te uniste al canal " + chanName);
             break;
+        }
         //--------- PRIVMSG -----------
         case Token::PRIVMSG:
             std::cout << "Ejecutando lógica de PRIVMSG..." << std::endl;
@@ -299,31 +315,48 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     }
 }
 
-void Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
+void	Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
 	if (args.size() < 2) {
 		send_message(sender->getFd(), "Error: KICK necesita un argumento.");
 		return;
 	}
+	std::string chanName = args[0];
 	std::string targetNick = args[1];
-	int targetFd = -1;
-	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		if (it->second.getNickname() == targetNick) {
-			targetFd = it->first;
-			break;
-		}
-	}
-	if (targetFd == -1) {
-		send_message(sender->getFd(), "Error: Usuario no encontrado.");
+
+	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
+	if (it == _channels.end()) {
+		send_message(sender->getFd(), "Error: El canal no existe.");
 		return;
 	}
-	send_message(targetFd, "Has sido expulsado por " + sender->getNickname());
-	send_message(sender->getFd(), "Usuario " + targetNick + " expulsado correctamente.");
-	close(targetFd);
-	_clients.erase(targetFd);
-	for (size_t i = 0; i < _pollfds.size(); ++i) {
-		if (_pollfds[i].fd == targetFd) {
-			_pollfds.erase(_pollfds.begin() + i);
-			break;
-		}
+	Channel& channel = it->second;
+	if (!channel.isOperator(sender)) {
+		send_message(sender->getFd(), "Error: No tienes permisos para expulsar usuarios.");
+		return;
 	}
+	Client* target = findClientByNick(targetNick);
+	if (!target || !channel.hasUser(target)) {
+		send_message(sender->getFd(), "Error: Usuario no encontrado en el canal.");
+		return;
+	}
+	channel.removeUser(target);
+	std::string kickMsg = "Has sido expulsado del canal " + chanName + " por " + sender->getNickname();
+	sendToChannel(channel, kickMsg);
+	send_message(target->getFd(), "Has sido expulsado por " + sender->getNickname());
+	send_message(sender->getFd(), "Usuario " + targetNick + " expulsado correctamente.");
+}
+
+Client* Server::findClientByNick(const std::string& nick) {
+    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        if (it->second.getNickname() == nick) {
+            return &it->second;
+        }
+    }
+    return NULL;
+}
+
+void Server::sendToChannel(const Channel& channel, const std::string& msg) {
+    const std::set<Client*>& users = channel.getUsers();
+    for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+        send_message((*it)->getFd(), msg);
+    }
 }

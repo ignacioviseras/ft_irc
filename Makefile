@@ -6,12 +6,8 @@ SRCS =	main.cpp \
 		Server.cpp \
 		Token.cpp \
 		Utils.cpp \
-		Client.cpp\
-# 		\
-# 		\
-# 		\
-# 		\
-# 		\
+		Client.cpp \
+		Channel.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
