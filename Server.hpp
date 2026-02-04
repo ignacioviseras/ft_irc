@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include "Utils.hpp"
-#include "Channel.hpp"
+#include <fcntl.h>#include "Channel.hpp"
 
 class Server
 {
@@ -31,10 +31,18 @@ class Server
         void handleNewConnection();
         void handleClientData(int fd);
         void handleStdin();
+        bool parse(const std::string& commandLine, std::vector<std::string>& args);
+        void handleCommand(int fd, std::string& commandLine);
+        void executeCommand(int fd, const std::vector<std::string>& args);
+        bool nicknameInUse(const std::string& nick);
+        void send_message(int fd, std::string message);
+        void checkRegistration(int fd, Client &user);
+
+
 
 		void _kickUser(Client* sender, const std::vector<std::string>& args);
     public:
-        Server(int port, const std::string &pass);
+        Server(int port, const std::string &password);
         ~Server();
         void run();
 

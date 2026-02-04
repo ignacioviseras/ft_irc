@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstring>
 #include "Token.hpp"
+#include <cstdlib>
 
 std::vector<std::string> split(const std::string& s, const std::string& delimiter);
 bool parse_commands(const std::string& input);

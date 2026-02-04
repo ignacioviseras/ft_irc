@@ -10,21 +10,18 @@ class Token
 
     public:
 
-        enum type
-        {
+        enum type {
             KICK,
             INVITE,
             TOPIC,
             MODE,
+            PASS, //auth
+            NICK, //auth
+            USER, //auth
+            JOIN,
+            PRIVMSG, // para mensajes
+            UNKNOWN //se puede usar por si no existe y asi se tramita
 
-            // PASS,
-            // NICK,
-            // USER,
-            // JOIN,
-
-            // PRIVMSG, // para mensajes
-            // PING,    //ara no se desconectar al cliente
-            // UNKNOWN //se puede usar por si no existe y asi se tramita
         };
 
         Token();
