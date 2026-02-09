@@ -299,9 +299,27 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             if (channel.getUsers().size() == 1) {
                 channel.setOperator(&user, true);
             }
-            std::string joinMsg = user.getNickname() + " se unió al canal " + chanName;
+            std::string serverName = "irc.servidor.com";
+            // Send JOIN message to all users in channel (including joiner)
+            std::string prefix = ":" + user.getNickname() + "!" + user.getUsername() + "@" + serverName;
+            std::string joinMsg = prefix + " JOIN :" + chanName;
             sendToChannel(channel, joinMsg);
-            send_message(fd, "Te uniste al canal " + chanName);
+
+            // Send NAMES reply (353) and end of NAMES (366) to the joining user
+            // Build user list
+            std::string userList;
+            const std::set<Client*>& users = channel.getUsers();
+            for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
+                if (!userList.empty()) userList += " ";
+                userList += (*it2)->getNickname();
+            }
+            std::string nick = user.getNickname();
+            std::string namesReply = ":" + serverName + " 353 " + nick + " = " + chanName + " :" + userList;
+            std::cout << "Sending: " << namesReply << std::endl;
+			send_message(fd, namesReply);
+            std::string endNames = ":" + serverName + " 366 " + nick + " " + chanName + " :End of /NAMES list.";
+            std::cout << "Sending: " << endNames << std::endl;
+			send_message(fd, endNames);
             break;
         }
         //--------- PRIVMSG -----------

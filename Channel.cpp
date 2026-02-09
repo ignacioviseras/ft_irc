@@ -1,5 +1,7 @@
 #include "Channel.hpp"
 #include "Client.hpp"
+#include <sys/socket.h>
+#include <unistd.h>
 
 Channel::Channel(const std::string& name) : _name(name) {}
 
@@ -36,4 +38,15 @@ const std::string& Channel::getName() const {
 
 const std::set<Client*>& Channel::getUsers() const {
     return _users;
+}
+
+void Channel::sendToChannel(Channel& channel, const std::string& message, Client* exclude) {
+    const std::set<Client*>& users = channel.getUsers();
+    for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+        Client* c = *it;
+        if (exclude && c == exclude)
+            continue;
+        std::string full = message + "\r\n";
+        send(c->getFd(), full.c_str(), full.length(), 0);
+    }
 }
