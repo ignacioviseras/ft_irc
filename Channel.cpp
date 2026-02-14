@@ -1,5 +1,4 @@
 #include "Channel.hpp"
-#include "Client.hpp"
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -32,6 +31,16 @@ void Channel::setOperator(Client* client, bool op) {
     }
 }
 
+void    Channel::setTopic(std::string top){
+    _topic = top;
+}
+
+std::string Channel::getTopic(){
+    if (_topic.empty())
+        return "There is no topic in the channel.";
+    return _topic;
+}
+
 const std::string& Channel::getName() const {
     return _name;
 }
@@ -50,3 +59,94 @@ void Channel::sendToChannel(Channel& channel, const std::string& message, Client
         send(c->getFd(), full.c_str(), full.length(), 0);
     }
 }
+
+//COMMANDS
+
+void    Channel::commandHub(Token tok, Client *client)
+{
+    switch (tok.getType())
+    {
+        case Token::INVITE:
+            commandInvite(client);
+            break;
+        case Token::TOPIC:
+        {
+                if (tok.getArgs().size() <= 1 || tok.getArgs()[1].empty())
+                    commandTopic(client);
+                else
+                    commandTopic(tok.getArgs()[1]);
+            break;
+        }
+        case Token::KICK:
+            commandKick(client);
+            break;
+        case Token::MODE:
+            commandMode(tok);
+        default:
+            break;
+    }
+}
+
+void	Channel::commandTopic(std::string top){
+    Channel::setTopic(top);
+}
+
+void	Channel::commandTopic(Client *client){
+    std::string toPrint = Channel::getTopic();
+    std::string full = toPrint + "\r\n";
+    send(client->getFd(), full.c_str(), full.length(), 0);
+}
+
+void	Channel::commandKick(Client *client){
+    Channel::removeUser(client);
+}
+
+void	Channel::commandInvite(Client *client){
+    Channel::addUser(client);
+}
+
+
+
+void   Channel::commandMode(Token tok){
+    const std::vector<std::string>& args = tok.getArgs();
+    if (args.size() <= 1 || args[1].empty())
+        return;
+    char flag = args[1][0];
+    switch (flag) {
+        case 'i':
+            commandModeInvite();
+            break;
+        case 't':
+            // Topic restricted to operators
+            break;
+        case 'k':
+           commandModeKey(tok);
+            break;
+        case 'o':
+            // Give/take channel operator privilege
+            break;
+        case 'l':
+            // User limit to channel
+            break;
+        default:
+            // Unknown flag
+            break;
+    }
+}
+
+void    Channel::commandModeInvite()
+{
+    if (_inviteOnly == true)
+        _inviteOnly = false;
+    else
+        _inviteOnly = true;
+}
+
+void    Channel::commandModeKey(Token tok)
+{
+    const std::vector<std::string>& args = tok.getArgs();
+    if (args.size() >= 3 && !args[2].empty()) {
+        _key = args[2];
+    }
+}
+

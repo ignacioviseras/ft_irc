@@ -1,7 +1,7 @@
 #include "Server.hpp"
 #include "Utils.hpp"
 
-void create_token()
+void create_Token()
 {
     
 }
@@ -31,8 +31,8 @@ void create_token()
 //                 std::cout << "COMANDO INVALIDO: " << input << std::endl;
 //                 continue ;
 //             }
-//             Token token_test = Token(token_assign_type(split(input, " ")[0]), split(input, " "));
-//             std::cout << "TOKEN ARGS:" << std::endl << "TYPE(enum) " << token_test.getType() << std::endl;
+//             Token Token_test = Token(Token_assign_type(split(input, " ")[0]), split(input, " "));
+//             std::cout << "Token ARGS:" << std::endl << "TYPE(enum) " << Token_test.getType() << std::endl;
 //         }
 //         delete(server);
 //     }

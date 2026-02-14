@@ -2,14 +2,14 @@
 
 //split guarro joseado para salir del paso
 std::vector<std::string> split(const std::string& s, const std::string& delimiter) {
-    std::vector<std::string> tokens;
+    std::vector<std::string> Tokens;
     size_t start = 0, end, delim_len = delimiter.length();
     while ((end = s.find(delimiter, start)) != std::string::npos) {
-        tokens.push_back(s.substr(start, end - start));
+        Tokens.push_back(s.substr(start, end - start));
         start = end + delim_len;
     }
-    tokens.push_back(s.substr(start));
-    return tokens;
+    Tokens.push_back(s.substr(start));
+    return Tokens;
 }
 
 bool parse_commands(const std::string& input)
@@ -29,9 +29,9 @@ bool parse_commands(const std::string& input)
         std::cout << "Error: Comando demasiado largo." << std::endl;
         return false;
     }
-    // int token_size = splitted_input.size();
+    // int Token_size = splitted_input.size();
     // //esta comprobacion es 
-    // if (token_size > 4)
+    // if (Token_size > 4)
     //     return (false);
     return (true);
 }
@@ -50,7 +50,7 @@ bool valid_server_port(const char *arg)
     return (true);
 }
 
-Token::type token_assign_type(const std::string& arg)
+Token::type Token_assign_type(const std::string& arg)
 {
     if (arg == "KICK")
         return (Token::KICK);

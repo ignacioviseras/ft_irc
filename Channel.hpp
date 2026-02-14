@@ -5,12 +5,19 @@
 #include <set>
 #include <map>
 #include "Client.hpp"
+#include "Token.hpp"
+// Removed inclusion of Server.hpp to avoid circular include with Server.hpp
+// Channel does not need Server declaration in this header
 
 class Channel {
 	private:
 	    std::string _name;
 	    std::set<Client*> _users;
 	    std::set<Client*> _operators;
+		std::string _topic;
+		std::string _key;
+		bool	_inviteOnly;
+
 	public:
 	    Channel(const std::string& name);
 	    ~Channel();
@@ -19,11 +26,28 @@ class Channel {
 	    void removeUser(Client* client);
 	    bool hasUser(Client* client) const;
 	    bool isOperator(Client* client) const;
+		void setTopic(std::string top);
+		std::string getTopic();
 	    void setOperator(Client* client, bool op);
 	    const std::string& getName() const;
 	    const std::set<Client*>& getUsers() const;
-
 		void sendToChannel(Channel& channel, const std::string& message, Client* exclude);
-};
+
+		//COMMANDS
+
+		void	commandHub(Token tok, Client *client);
+		void	commandKick(Client *client);
+		void	commandInvite(Client *client);
+		void	commandTopic(std::string top);
+		void	commandTopic(Client *client);
+		void    commandMode(Token tok);
+
+		void    commandModeInvite();
+		void    commandModeKey(Token tok);
+		//void    commandMode(Token tok);
+		//void    commandMode(Token tok);
+
+
+	};
 
 #endif

@@ -112,8 +112,8 @@ void Server::handleStdin() {
 	if (!parse(input, args)) {
     	executeCommand(STDIN_FILENO, args);
 	}
-    //Token token_test(token_assign_type(split(input, " ")[0]), split(input, " "));
-    //std::cout << "TOKEN GENERADO - Tipo: " << token_test.getType() << std::endl;
+    //Token Token_test(Token_assign_type(split(input, " ")[0]), split(input, " "));
+    //std::cout << "Token GENERADO - Tipo: " << Token_test.getType() << std::endl;
 }
 
 void Server::handleClientData(int fd) {
@@ -199,7 +199,7 @@ void Server::checkRegistration(int fd, Client &user) {
 }
 
 void Server::executeCommand(int fd, const std::vector<std::string>& args) {
-    Token::type cmdType = token_assign_type(args[0]);
+    Token::type cmdType = Token_assign_type(args[0]);
 
     Client& user = _clients[fd];
     if (!user._isPasswordOk && cmdType != Token::PASS) {
