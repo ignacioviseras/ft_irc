@@ -1,0 +1,20 @@
+OPERADORES
+Poner que el primer usuario sea operador
+Gestionar arroba
+
+COMANDOS
+Terminar el switch
+comandos:
+- Kick
+- Invite
+- Topic
+- Mode:
+	- i
+	- t
+	- k
+	- o* (Ver con los operadores)
+	- l
+
+CONECTARSE CON DOS CLIENTES
+El server sí lo recibe, no se ve reflejado en el otro cliente
+Problemas de códigos tipo 353?
