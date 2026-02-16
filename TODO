@@ -3,8 +3,8 @@ Poner que el primer usuario sea operador
 Gestionar arroba
 
 COMANDOS
-Terminar el switch
-comandos:
+Terminar el switch DONE
+comandos: DONE A FALTA DE TEST Y ESPECIDFICOS
 - Kick
 - Invite
 - Topic
@@ -12,8 +12,8 @@ comandos:
 	- i
 	- t
 	- k
-	- o* (Ver con los operadores)
-	- l
+	- o* (Ver con los operadores) FALTA
+	- l FALTA
 
 CONECTARSE CON DOS CLIENTES
 El server sí lo recibe, no se ve reflejado en el otro cliente

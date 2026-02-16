@@ -44,6 +44,11 @@ class Server
 		Client* findClientByNick(const std::string& nick);
 		void sendToChannel(const Channel& channel, const std::string& msg);
 
+		//mixi
+
+		Channel* findServer(const std::vector<std::string>& args);
+
+
 	public:
         Server(int port, const std::string &password);
         ~Server();

@@ -198,6 +198,20 @@ void Server::checkRegistration(int fd, Client &user) {
     }
 }
 
+//mixi
+
+Channel* Server::findServer(const std::vector<std::string>& args)
+{
+	std::string chanName = args[1];
+	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
+	if (it == _channels.end()) {
+		_channels.insert(std::make_pair(chanName, Channel(chanName)));
+		it = _channels.find(chanName);
+	}
+	Channel& channel = it->second;
+	return (&channel);
+}
+
 void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     Token::type cmdType = Token_assign_type(args[0]);
 
@@ -211,22 +225,30 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         send_message(fd, "Error: Completa tu registro con NICK y USER.");
         return;
     }
+	Channel *c = findServer(args);
     switch (cmdType) {
         //--------- KICK -----------
         case Token::KICK:
-			_kickUser(&user, args);
+		{
+			c->commandKick(&user);
             break;
+		}
         //--------- INVITE -----------
         case Token::INVITE:
-            std::cout << "Ejecutando lógica de INVITE..." << std::endl;
+            c->commandInvite(&user);
             break;
         //--------- TOPIC -----------
         case Token::TOPIC:
-            std::cout << "Ejecutando lógica de TOPIC..." << std::endl;
+		{
+                if (args.size() <= 1)
+                    c->commandTopic(&user);
+                else
+                    c->commandTopic(args[1]);
             break;
+        }
         //--------- MODE -----------
         case Token::MODE:
-            std::cout << "Ejecutando lógica de MODE..." << std::endl;
+        	c->commandMode(args);
             break;
         //--------- PASS -----------
         case Token::PASS:{

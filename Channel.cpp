@@ -62,30 +62,30 @@ void Channel::sendToChannel(Channel& channel, const std::string& message, Client
 
 //COMMANDS
 
-void    Channel::commandHub(Token tok, Client *client)
-{
-    switch (tok.getType())
-    {
-        case Token::INVITE:
-            commandInvite(client);
-            break;
-        case Token::TOPIC:
-        {
-                if (tok.getArgs().size() <= 1 || tok.getArgs()[1].empty())
-                    commandTopic(client);
-                else
-                    commandTopic(tok.getArgs()[1]);
-            break;
-        }
-        case Token::KICK:
-            commandKick(client);
-            break;
-        case Token::MODE:
-            commandMode(tok);
-        default:
-            break;
-    }
-}
+// void    Channel::commandHub(Token tok, Client *client)
+// {
+//     switch (tok.getType())
+//     {
+//         case Token::INVITE:
+//             commandInvite(client);
+//             break;
+//         case Token::TOPIC:
+//         {
+//                 if (tok.getArgs().size() <= 1 || tok.getArgs()[1].empty())
+//                     commandTopic(client);
+//                 else
+//                     commandTopic(tok.getArgs()[1]);
+//             break;
+//         }
+//         case Token::KICK:
+//             commandKick(client);
+//             break;
+//         case Token::MODE:
+//             commandMode(tok);
+//         default:
+//             break;
+//     }
+// }
 
 void	Channel::commandTopic(std::string top){
     Channel::setTopic(top);
@@ -107,26 +107,26 @@ void	Channel::commandInvite(Client *client){
 
 
 
-void   Channel::commandMode(Token tok){
-    const std::vector<std::string>& args = tok.getArgs();
+void   Channel::commandMode(const std::vector<std::string>& args){
+
     if (args.size() <= 1 || args[1].empty())
         return;
     char flag = args[1][0];
     switch (flag) {
         case 'i':
-            commandModeInvite();
+            this->commandModeInvite();
             break;
         case 't':
-            // Topic restricted to operators
+            this->commandModeTopic();
             break;
         case 'k':
-           commandModeKey(tok);
+    		this->commandModeKey(args);
             break;
         case 'o':
-            // Give/take channel operator privilege
+            this->commandModeOperator(args);
             break;
         case 'l':
-            // User limit to channel
+            this->commandModeLimit(args);
             break;
         default:
             // Unknown flag
@@ -142,11 +142,42 @@ void    Channel::commandModeInvite()
         _inviteOnly = true;
 }
 
-void    Channel::commandModeKey(Token tok)
+void    Channel::commandModeKey(const std::vector<std::string>& args)
 {
-    const std::vector<std::string>& args = tok.getArgs();
+
+	//MUY SUJETO A CAMBIOS Y REVISION
     if (args.size() >= 3 && !args[2].empty()) {
         _key = args[2];
     }
 }
 
+void    Channel::commandModeTopic()
+{
+	if (_topicRestricted == true)
+		_topicRestricted = false;
+	else
+		_topicRestricted = true;
+}
+
+void    Channel::commandModeOperator(const std::vector<std::string>& args)
+{
+	(void) args;
+}
+
+
+void    Channel::commandModeLimit(const std::vector<std::string>& args)
+{
+
+	(void)args;
+	//MUY RAOR
+    // if (args.size() < 3 || args[2].empty())
+    //     return;
+    // try {
+    //     int val = std::stoi(args[2]);
+    //     if (val < 0) // ignore negative limits
+    //         return;
+    //     _channelLimit = val;
+    // } catch (const std::exception&) {
+    //     // invalid number -> ignore
+    // }
+}
