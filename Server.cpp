@@ -229,7 +229,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     switch (cmdType) {
         //--------- KICK -----------
         case Token::KICK:
-		{
+		{ 
 			c->commandKick(&user);
             break;
 		}
@@ -240,10 +240,10 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         //--------- TOPIC -----------
         case Token::TOPIC:
 		{
-                if (args.size() <= 1)
+                if (args.size() <= 2)
                     c->commandTopic(&user);
                 else
-                    c->commandTopic(args[1]);
+                    c->commandTopic(args);
             break;
         }
         //--------- MODE -----------

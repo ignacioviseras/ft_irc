@@ -6,8 +6,13 @@
 #include <map>
 #include "Client.hpp"
 #include "Token.hpp"
-// Removed inclusion of Server.hpp to avoid circular include with Server.hpp
-// Channel does not need Server declaration in this header
+#include <sys/socket.h>
+#include <unistd.h>
+#include <cstdlib>
+#include <cerrno>
+#include <limits>
+
+
 
 class Channel {
 	private:
@@ -41,7 +46,7 @@ class Channel {
 		void	commandHub(Token tok, Client *client);
 		void	commandKick(Client *client);
 		void	commandInvite(Client *client);
-		void	commandTopic(std::string top);
+		void	commandTopic(const std::vector<std::string>& args);
 		void	commandTopic(Client *client);
 		void    commandMode(const std::vector<std::string>& args);
 

@@ -1,8 +1,7 @@
 #include "Channel.hpp"
-#include <sys/socket.h>
-#include <unistd.h>
 
-Channel::Channel(const std::string& name) : _name(name) {}
+
+Channel::Channel(const std::string& name) : _name(name), _topic("default"),_inviteOnly(false), _topicRestricted(false), _channelLimit(-1) {}
 
 Channel::~Channel() {}
 
@@ -60,34 +59,18 @@ void Channel::sendToChannel(Channel& channel, const std::string& message, Client
     }
 }
 
-//COMMANDS
+void	Channel::commandTopic(const std::vector<std::string>& args){
 
-// void    Channel::commandHub(Token tok, Client *client)
-// {
-//     switch (tok.getType())
-//     {
-//         case Token::INVITE:
-//             commandInvite(client);
-//             break;
-//         case Token::TOPIC:
-//         {
-//                 if (tok.getArgs().size() <= 1 || tok.getArgs()[1].empty())
-//                     commandTopic(client);
-//                 else
-//                     commandTopic(tok.getArgs()[1]);
-//             break;
-//         }
-//         case Token::KICK:
-//             commandKick(client);
-//             break;
-//         case Token::MODE:
-//             commandMode(tok);
-//         default:
-//             break;
-//     }
-// }
+	std::string top;
 
-void	Channel::commandTopic(std::string top){
+    for (size_t i = 2; i < args.size(); ++i) {
+        if (i > 2)
+            top += " ";
+        top += args[i];
+    }
+    if (!top.empty() && top[0] == ':')
+        top.erase(0, 1);
+    setTopic(top);
     Channel::setTopic(top);
 }
 
@@ -162,22 +145,26 @@ void    Channel::commandModeTopic()
 void    Channel::commandModeOperator(const std::vector<std::string>& args)
 {
 	(void) args;
+	//implementar la forma en la que se generan los operadores pero a la ionversa
+	//acordarse de quitar/poner operadores en las respectivas listas de cada sitio (lista de canales en cliente) (lista de operadores en canal)
 }
 
 
 void    Channel::commandModeLimit(const std::vector<std::string>& args)
 {
+    if (args.size() < 3 || args[2].empty())
+        return;
 
-	(void)args;
-	//MUY RAOR
-    // if (args.size() < 3 || args[2].empty())
-    //     return;
-    // try {
-    //     int val = std::stoi(args[2]);
-    //     if (val < 0) // ignore negative limits
-    //         return;
-    //     _channelLimit = val;
-    // } catch (const std::exception&) {
-    //     // invalid number -> ignore
-    // }
+    const char* s = args[2].c_str();
+    char* end = NULL;
+    errno = 0;
+    long val = std::strtol(s, &end, 10);
+
+    if (end == s || *end != '\0' || errno == ERANGE)
+        return;
+
+    if (val < 0 || val > static_cast<long>(std::numeric_limits<int>::max()))
+        return;
+
+    _channelLimit = static_cast<int>(val);
 }
