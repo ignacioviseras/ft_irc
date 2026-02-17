@@ -17,6 +17,9 @@ class Channel {
 		std::string _topic;
 		std::string _key;
 		bool	_inviteOnly;
+		bool	_topicRestricted;
+		int		_channelLimit;
+
 
 	public:
 	    Channel(const std::string& name);
@@ -40,12 +43,13 @@ class Channel {
 		void	commandInvite(Client *client);
 		void	commandTopic(std::string top);
 		void	commandTopic(Client *client);
-		void    commandMode(Token tok);
+		void    commandMode(const std::vector<std::string>& args);
 
 		void    commandModeInvite();
-		void    commandModeKey(Token tok);
-		//void    commandMode(Token tok);
-		//void    commandMode(Token tok);
+		void    commandModeKey(const std::vector<std::string>& args);
+		void    commandModeOperator(const std::vector<std::string>& args);
+		void    commandModeTopic();
+		void    commandModeLimit(const std::vector<std::string>& args);
 
 
 	};
