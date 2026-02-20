@@ -360,12 +360,50 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         //--------- PRIVMSG -----------
         case Token::PRIVMSG:
             std::cout << "Ejecutando lógica de PRIVMSG..." << std::endl;
+			_privMsg(&user, args);
             break;
         case Token::UNKNOWN:
         default:
             std::cerr << "Comando desconocido: " << args[0] << std::endl;
             break;
     }
+}
+
+void	Server::_privMsg(Client* sender, const std::vector<std::string>& args) {
+	if (args.size() < 3) {
+		send_message(sender->getFd(), "Error: PRIVMSG necesita al menos 2 argumentos: destinatario y mensaje.");
+		return;
+	}
+	std::string target = args[1];
+	std::string message;
+	for (size_t i = 2; i < args.size(); ++i) {
+		message += args[i] + " ";
+	}
+	if (!message.empty())
+		message.erase(message.length() - 1);
+
+	if (target[0] == '#') {
+		std::map<std::string, Channel>::iterator it = _channels.find(target);
+		if (it == _channels.end()) {
+			send_message(sender->getFd(), "Error: El canal no existe.");
+			return;
+		}
+		Channel& channel = it->second;
+		if (!channel.hasUser(sender)) {
+			send_message(sender->getFd(), "Error: No estás en el canal " + target);
+			return;
+		}
+		std::string fullMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com PRIVMSG " + target + " :" + message;
+		channel.sendToChannel(channel, fullMsg, sender);
+	} else {
+		Client* recipient = findClientByNick(target);
+		if (!recipient) {
+			send_message(sender->getFd(), "Error: Usuario no encontrado.");
+			return;
+		}
+		std::string fullMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com PRIVMSG " + target + " :" + message;
+		send_message(recipient->getFd(), fullMsg);
+	}
 }
 
 void	Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
