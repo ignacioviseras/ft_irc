@@ -48,8 +48,8 @@ const std::set<Client*>& Channel::getUsers() const {
     return _users;
 }
 
-void Channel::sendToChannel(Channel& channel, const std::string& message, Client* exclude) {
-    const std::set<Client*>& users = channel.getUsers();
+void Channel::sendToChannel(const std::string& message, Client* exclude) {
+    const std::set<Client*>& users = this->getUsers();
     for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
         Client* c = *it;
         if (exclude && c == exclude)
@@ -71,22 +71,22 @@ void	Channel::commandTopic(const std::vector<std::string>& args){
     if (!top.empty() && top[0] == ':')
         top.erase(0, 1);
     setTopic(top);
-    Channel::setTopic(top);
 }
 
 void	Channel::commandTopic(Client *client){
+	(void)client;
     std::string toPrint = Channel::getTopic();
-    std::string full = toPrint + "\r\n";
-    send(client->getFd(), full.c_str(), full.length(), 0);
+    // std::string full = toPrint + "\r\n";
+	sendToChannel(toPrint, 0);
 }
 
-void	Channel::commandKick(Client *client){
-    Channel::removeUser(client);
-}
+// void	Channel::commandKick(Client *client){
+//     Channel::removeUser(client);
+// }
 
-void	Channel::commandInvite(Client *client){
-    Channel::addUser(client);
-}
+// void	Channel::commandInvite(Client *client){
+//     Channel::addUser(client);
+// }
 
 
 

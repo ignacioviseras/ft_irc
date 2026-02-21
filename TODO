@@ -19,3 +19,10 @@ CONECTARSE CON DOS CLIENTES
 - ~~El server sí lo recibe, no se ve reflejado en el otro cliente~~
 - ~~Sólo se conecta el cliente WSL al canal si ponemos el nombre del canal con (cosa que no hace falta en HexChat)~~
 - Los mensajes no se enseñan en el otro cliente
+
+
+EXTRAS
+
+Asegurarse de que el /join posee una modalidad para acceso con contraseña
+Todo lo que tiene que ver con contraseñas
+/join comprueba que un canal sea invite only o no

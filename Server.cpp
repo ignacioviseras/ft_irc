@@ -230,12 +230,12 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         //--------- KICK -----------
         case Token::KICK:
 		{ 
-			c->commandKick(&user);
+			_kickUser(&user, args);
             break;
 		}
         //--------- INVITE -----------
         case Token::INVITE:
-            c->commandInvite(&user);
+            // c->commandInvite(&user);
             break;
         //--------- TOPIC -----------
         case Token::TOPIC:
