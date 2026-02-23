@@ -18,4 +18,4 @@ comandos: DONE A FALTA DE TEST Y ESPECIDFICOS
 CONECTARSE CON DOS CLIENTES
 - ~~El server sí lo recibe, no se ve reflejado en el otro cliente~~
 - ~~Sólo se conecta el cliente WSL al canal si ponemos el nombre del canal con (cosa que no hace falta en HexChat)~~
-- Los mensajes no se enseñan en el otro cliente
+- ~~Los mensajes no se enseñan en el otro cliente~~

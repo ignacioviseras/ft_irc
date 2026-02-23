@@ -88,8 +88,6 @@ void	Channel::commandInvite(Client *client){
     Channel::addUser(client);
 }
 
-
-
 void   Channel::commandMode(const std::vector<std::string>& args){
 
     if (args.size() <= 1 || args[1].empty())

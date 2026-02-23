@@ -40,6 +40,7 @@ class Server
         void send_message(int fd, std::string message);
         void checkRegistration(int fd, Client &user);
 
+		void _join()
 		void _privMsg(Client* sender, const std::vector<std::string>& args);
 		void _kickUser(Client* sender, const std::vector<std::string>& args);
 		Client* findClientByNick(const std::string& nick);
