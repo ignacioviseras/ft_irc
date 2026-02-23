@@ -56,6 +56,7 @@ class Channel {
 		void    commandModeTopic();
 		void    commandModeLimit(const std::vector<std::string>& args);
 
+		void 	sendMessage(Client* sender, const std::string& message);
 
 	};
 
