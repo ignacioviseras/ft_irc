@@ -80,13 +80,11 @@ void	Channel::commandTopic(Client *client){
 	sendToChannel(toPrint, 0);
 }
 
-// void	Channel::commandKick(Client *client){
-//     Channel::removeUser(client);
-// }
-
-// void	Channel::commandInvite(Client *client){
-//     Channel::addUser(client);
-// }
+void	Channel::commandInvite(Client *sender, const std::vector<std::string>& args){
+    (void)sender;
+    (void)args;
+    // Implementation for invite command
+}
 
 void   Channel::commandMode(const std::vector<std::string>& args){
 

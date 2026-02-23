@@ -240,7 +240,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 		}
         //--------- INVITE -----------
         case Token::INVITE:
-            // c->commandInvite(&user);
+            c->commandInvite(&user, args);
             break;
         //--------- TOPIC -----------
         case Token::TOPIC:
@@ -320,31 +320,6 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             std::cerr << "Comando desconocido: " << args[0] << std::endl;
             break;
     }
-    switch (cmdType) {
-        //--------- KICK -----------
-        case Token::KICK:
-		{ 
-			c->commandKick(&user);
-            break;
-		}
-        //--------- INVITE -----------
-        case Token::INVITE:
-            c->commandInvite(&user);
-            break;
-        //--------- TOPIC -----------
-        case Token::TOPIC:
-		{
-                if (args.size() <= 2)
-                    c->commandTopic(&user);
-                else
-                    c->commandTopic(args);
-            break;
-        }
-        //--------- MODE -----------
-        case Token::MODE:
-        	c->commandMode(args);
-            break;
-	}
 }
 
 void	Server::_join(int fd, const std::vector<std::string>& args) {
@@ -352,6 +327,7 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
 		send_message(fd, "Error: JOIN necesita un nombre de canal.");
 		return;
 	}
+    Client& user = _clients[fd];
     std::string chanName = args[1];
     
     // Añadir # al nombre del canal si no lo tiene
@@ -427,7 +403,7 @@ void	Server::_privMsg(Client* sender, const std::vector<std::string>& args) {
 			return;
 		}
 		std::string fullMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com PRIVMSG " + target + " :" + message;
-		channel.sendToChannel(channel, fullMsg, sender);
+		channel.sendToChannel(fullMsg, sender);
 	} else {
 		Client* recipient = findClientByNick(target);
 		if (!recipient) {
