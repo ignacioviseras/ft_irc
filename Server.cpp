@@ -420,9 +420,10 @@ void	Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
 		send_message(sender->getFd(), "Error: KICK necesita un argumento.");
 		return;
 	}
-	std::string chanName = args[0];
-	std::string targetNick = args[1];
+	std::string chanName = args[1];
+	std::string targetNick = args[2];
 
+	//std::cout << "HA ENTRADO EN KICKUSER CON CANAL: " << chanName << " Y TARGET: " << targetNick << std::endl;
 	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
 	if (it == _channels.end()) {
 		send_message(sender->getFd(), "Error: El canal no existe.");
@@ -430,18 +431,22 @@ void	Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
 	}
 	Channel& channel = it->second;
 	if (!channel.isOperator(sender)) {
-		send_message(sender->getFd(), "Error: No tienes permisos para expulsar usuarios.");
+		std::string errorMsg = ":irc.servidor.com 482 " + sender->getNickname() + " " + chanName + " :You must be a channel operator";
+		send_message(sender->getFd(), errorMsg);
 		return;
 	}
 	Client* target = findClientByNick(targetNick);
 	if (!target || !channel.hasUser(target)) {
-		send_message(sender->getFd(), "Error: Usuario no encontrado en el canal.");
+		std::string errorMsg = ":irc.servidor.com 441 " + sender->getNickname() + " " + targetNick + " " + chanName + " :They aren't on that channel";
+		send_message(sender->getFd(), errorMsg);
 		return;
 	}
-	channel.removeUser(target);
-	std::string kickMsg = "Has sido expulsado del canal " + chanName + " por " + sender->getNickname();
+	// Enviar KICK a todos (incluyendo al expulsado) ANTES de removerlo
+	std::string kickMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com KICK " + chanName + " " + targetNick;
 	sendToChannel(channel, kickMsg);
-	send_message(target->getFd(), "Has sido expulsado por " + sender->getNickname());
+	send_message(target->getFd(), kickMsg);
+	// Ahora remover al usuario del canal
+	channel.removeUser(target);
 	send_message(sender->getFd(), "Usuario " + targetNick + " expulsado correctamente.");
 }
 
