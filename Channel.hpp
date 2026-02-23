@@ -39,13 +39,13 @@ class Channel {
 	    void setOperator(Client* client, bool op);
 	    const std::string& getName() const;
 	    const std::set<Client*>& getUsers() const;
-		void sendToChannel(Channel& channel, const std::string& message, Client* exclude);
+		void sendToChannel(const std::string& message, Client* exclude);
 
 		//COMMANDS
 
 		void	commandHub(Token tok, Client *client);
-		void	commandKick(Client *client);
-		void	commandInvite(Client *client);
+		// void	commandKick(Client* sender, const std::vector<std::string>& args);
+		void	commandInvite(Client* sender, const std::vector<std::string>& args);
 		void	commandTopic(const std::vector<std::string>& args);
 		void	commandTopic(Client *client);
 		void    commandMode(const std::vector<std::string>& args);

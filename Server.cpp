@@ -231,8 +231,31 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         return;
     }
 	Channel *c = findServer(args);
-	switch (cmdType) {
-		//--------- PASS -----------
+    switch (cmdType) {
+        //--------- KICK -----------
+        case Token::KICK:
+		{ 
+			_kickUser(&user, args);
+            break;
+		}
+        //--------- INVITE -----------
+        case Token::INVITE:
+            // c->commandInvite(&user);
+            break;
+        //--------- TOPIC -----------
+        case Token::TOPIC:
+		{
+                if (args.size() <= 2)
+                    c->commandTopic(&user);
+                else
+                    c->commandTopic(args);
+            break;
+        }
+        //--------- MODE -----------
+        case Token::MODE:
+        	c->commandMode(args);
+            break;
+        //--------- PASS -----------
         case Token::PASS:{
             if (args.size() < 2) {
                 send_message(fd, "Error: PASS necesita la contraseña.");
