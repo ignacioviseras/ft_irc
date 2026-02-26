@@ -1,6 +1,7 @@
 #include "../../include/Server.hpp"
 
 void Server::_quit(Client* sender, const std::vector<std::string>& args) {
+	std::cout << "Ejecutando lógica de QUIT..." << std::endl;
     int fd = sender->getFd();
     std::string reason = "";
     if (args.size() > 1) {
@@ -12,6 +13,33 @@ void Server::_quit(Client* sender, const std::vector<std::string>& args) {
     std::string msg = "Adiós!!!";
     if (!reason.empty()) msg += ": " + reason;
     send_message(fd, msg);
+
+	for (std::set<std::string>::iterator it = sender->channels_joined.begin(); it != sender->channels_joined.end(); ++it) {
+		std::string chanName = *it;
+		std::map<std::string, Channel>::iterator it2 = _channels.find(chanName);
+		if (it2 != _channels.end()) {
+			it2->second.removeUser(sender);
+			std::string userList;
+    		const std::set<Client*>& users = it2->second.getUsers();
+    		for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
+    		    if (!userList.empty()) userList += " ";
+				// Añadir @ para operadores
+				/* if (it2->second.isOperator(*it2))
+				userList += "@"; */
+				userList += (*it2)->getNickname();
+			}
+			std::string serverName = "irc.servidor.com";
+			for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
+    		    Client* c = *it2;
+    		    std::string namesReply = ":" + serverName + " 353 " + c->getNickname() + " = " + chanName + " :" + userList;
+    		    std::cout << "Sending NAMES to " << c->getNickname() << ": " << namesReply << std::endl;
+    		    send_message(c->getFd(), namesReply);
+    		    std::string endNames = ":" + serverName + " 366 " + c->getNickname() + " " + chanName + " :End of /NAMES list.";
+    		    std::cout << "Sending: " << endNames << std::endl;
+    		    send_message(c->getFd(), endNames);
+    		}
+		}
+	}
 
     close(fd);
     _clients.erase(fd);

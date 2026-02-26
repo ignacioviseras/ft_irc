@@ -43,13 +43,14 @@ class Server
 		void _join(int fd, const std::vector<std::string>& args);
 		void _privMsg(Client* sender, const std::vector<std::string>& args);
 		void _kickUser(Client* sender, const std::vector<std::string>& args);
-		
+
 		void _user(Client* sender, const std::vector<std::string>& args);
 		void _quit(Client* sender, const std::vector<std::string>& args);
 		void _pass(Client* sender, const std::vector<std::string>& args);
 		void _nick(int fd, const std::vector<std::string>& args);
 
 		void sendToChannel(const Channel& channel, const std::string& msg);
+		void sendChannelNames(Channel* channel, const std::string& serverName);
 
 		Client* findClientByNick(const std::string& nick);
 

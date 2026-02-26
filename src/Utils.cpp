@@ -1,4 +1,5 @@
 #include "../include/Utils.hpp"
+#include "../include/Server.hpp"
 
 //split guarro joseado para salir del paso
 std::vector<std::string> split(const std::string& s, const std::string& delimiter) {
@@ -74,4 +75,19 @@ Token::type Token_assign_type(const std::string& arg)
 		return (Token::QUIT);
     else
         return (Token::UNKNOWN);
+}
+
+void Server::sendChannelNames(Channel* channel, const std::string& serverName) {
+	const std::string& chanName = channel->getName();
+	std::string userList;
+	const std::set<Client*>& users = channel->getUsers();
+	for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
+        Client* c = *it2;
+        std::string namesReply = ":" + serverName + " 353 " + c->getNickname() + " = " + chanName + " :" + userList;
+        std::cout << "Sending NAMES to " << c->getNickname() << ": " << namesReply << std::endl;
+        send_message(c->getFd(), namesReply);
+        std::string endNames = ":" + serverName + " 366 " + c->getNickname() + " " + chanName + " :End of /NAMES list.";
+        std::cout << "Sending: " << endNames << std::endl;
+        send_message(c->getFd(), endNames);
+    }
 }

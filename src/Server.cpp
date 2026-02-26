@@ -189,11 +189,12 @@ void Server::send_message(int fd, std::string message) {
         std::cerr << "Error enviando mensaje al fd: " << fd << std::endl;
     }
 }
+
 void Server::checkRegistration(int fd, Client &user) {
     if (user._isPasswordOk && !user.getUsername().empty() && !user.getNickname().empty() && !user.isRegisted()) {
         user.setRegisted(true);
         std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE: " << user.getNickname() << " ---" << std::endl;
-        std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network";//no se como poner los logs tanto en serv como en clinent
+        std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network"; // no se como poner los logs tanto en serv como en client
         send_message(fd, welcome);
     }
 }
