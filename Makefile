@@ -1,13 +1,20 @@
 NAME = ircserv
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
-SRCS =	main.cpp \
-		Exceptions.cpp \
-		Server.cpp \
-		Token.cpp \
-		Utils.cpp \
-		Client.cpp \
-		Channel.cpp
+SRCS =	src/main.cpp \
+		src/Exceptions.cpp \
+		src/Server.cpp \
+		src/Token.cpp \
+		src/Utils.cpp \
+		src/Client.cpp \
+		src/Channel.cpp \
+		src/commands/user.cpp \
+		src/commands/nick.cpp \
+		src/commands/pass.cpp \
+		src/commands/join.cpp \
+		src/commands/privmsg.cpp \
+		src/commands/kickUser.cpp \
+		src/commands/quit.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

@@ -1,4 +1,4 @@
-#include "Utils.hpp"
+#include "../include/Utils.hpp"
 
 //split guarro joseado para salir del paso
 std::vector<std::string> split(const std::string& s, const std::string& delimiter) {
@@ -70,6 +70,8 @@ Token::type Token_assign_type(const std::string& arg)
         return (Token::JOIN);
     else if (arg == "PRIVMSG")
         return (Token::PRIVMSG);
+	else if (arg == "QUIT")
+		return (Token::QUIT);
     else
         return (Token::UNKNOWN);
 }

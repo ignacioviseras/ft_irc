@@ -10,6 +10,7 @@ public:
     Client(int fd);
     ~Client();
 	std::set<std::string> channels_operating;
+	std::set<std::string> channels_joined;
     bool _isRegistered;
     bool _isPasswordOk;
     bool isRegisted() const;
@@ -19,6 +20,9 @@ public:
 
     void setNickname(const std::string &nickname);
     void setUsername(const std::string &username);
+    void setHostname(const std::string &hostname);
+    void setServername(const std::string &servername);
+    void setRealname(const std::string &realname);
     std::string &getNickname();
     std::string &getUsername();
     
@@ -28,6 +32,9 @@ private:
     std::string _buffer;
     std::string _nickname;
     std::string _username;
+    std::string _hostname;
+    std::string _servername;
+    std::string _realname;
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../include/Server.hpp"
 #include <fcntl.h>
 
 
@@ -232,6 +232,26 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     }
 	Channel *c = findServer(args);
     switch (cmdType) {
+        //--------- USER -----------
+        case Token::USER:{
+            _user(&user, args);
+            break;
+        }
+        //--------- NICK -----------
+        case Token::NICK: {
+            _nick(fd, args);
+            break;
+        }
+        //--------- PASS -----------
+        case Token::PASS:{
+			_pass(&user, args);
+            break;
+        }
+        //--------- JOIN -----------
+        case Token::JOIN: {
+            _join(fd, args);
+            break;
+        }
         //--------- KICK -----------
         case Token::KICK:
 		{ 
@@ -240,7 +260,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 		}
         //--------- INVITE -----------
         case Token::INVITE:
-            c->commandInvite(&user, args);
+            //c->commandInvite(&user, args);
             break;
         //--------- TOPIC -----------
         case Token::TOPIC:
@@ -255,61 +275,10 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         case Token::MODE:
         	c->commandMode(args);
             break;
-        //--------- PASS -----------
-        case Token::PASS:{
-            if (args.size() < 2) {
-                send_message(fd, "Error: PASS necesita la contraseña.");
-                return;
-            }
-            if (user.isRegisted())
-                break;
-            if (args[1] == this->_password) {
-                user._isPasswordOk = true;
-                send_message(fd, "password okey");
-            } else 
-                send_message(fd, "Error: password");
-            break;
-        }
-        //--------- NICK -----------
-        case Token::NICK: {
-            if (args.size() < 2) {
-                send_message(fd, "Error: NICK necesita el nickname 'NICK <nickname>'");
-                return;
-            }
-            std::string nickName = args[1];
-            if (nickName.empty() || nicknameInUse(nickName)) {
-                std::cout << "fd: " << fd << " error in setnickname" << std::endl;
-                return;
-            } else{
-                user.setNickname(nickName);
-                std::cout << "fd: " << fd << " setnickname '"<< nickName <<"' okey" << std::endl;
-                checkRegistration(fd, user);
-                return;
-            } 
-            break;
-        }
-        //--------- USER -----------
-        case Token::USER:{
-            if (args.size() < 5) { // USER <username> <hostname> <servername> <realname>
-                send_message(fd, "Error: USER necesita 4 argumentos <username> <hostname> <servername> <realname>");
-                return;
-            }
-            if (user.isRegisted()) {
-                send_message(fd, "Error: Ya estás registrado");
-                return;
-            }
-            user.setUsername(args[1]);
-            // hostname y servername se suelen ignorar o guardar por log
-            // creo q solo tengo q guardar el args[1] -> username PREGUNTAR
-            std::cout << "fd: " << fd << " Username establecido a: " << args[1] << std::endl;
-            checkRegistration(fd, user);
-            break;
-        }
-        //--------- JOIN -----------
-        case Token::JOIN: {
-            _join(fd, args);
-            break;
-        }
+		case Token::QUIT: {
+            _quit(&user, args);
+			break;
+		}
         //--------- PRIVMSG -----------
         case Token::PRIVMSG:
             std::cout << "Ejecutando lógica de PRIVMSG..." << std::endl;
@@ -320,134 +289,6 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             std::cerr << "Comando desconocido: " << args[0] << std::endl;
             break;
     }
-}
-
-void	Server::_join(int fd, const std::vector<std::string>& args) {
-	if (args.size() < 2) {
-		send_message(fd, "Error: JOIN necesita un nombre de canal.");
-		return;
-	}
-    Client& user = _clients[fd];
-    std::string chanName = args[1];
-    
-    // Añadir # al nombre del canal si no lo tiene
-    if (chanName[0] != '#') {
-        chanName = "#" + chanName;
-    }
-    
-    std::map<std::string, Channel>::iterator it = _channels.find(chanName);
-    if (it == _channels.end()) {
-		_channels.insert(std::make_pair(chanName, Channel(chanName)));
-        it = _channels.find(chanName);
-		user.channels_operating.insert(chanName);
-	}
-    Channel& channel = it->second;
-    if (channel.hasUser(&user)) {
-        send_message(fd, "Error: Ya estás en el canal " + chanName);
-        return;
-    }
-    channel.addUser(&user);
-    if (channel.getUsers().size() == 1) {
-        channel.setOperator(&user, true);
-    }
-    std::string serverName = "irc.servidor.com";
-    // Enviar mensaje de JOIN a todos los usuarios del canal
-    std::string prefix = ":" + user.getNickname() + "!" + user.getUsername() + "@" + serverName;
-    std::string joinMsg = prefix + " JOIN :" + chanName;
-    sendToChannel(channel, joinMsg);
-    // Construir la lista de usuarios para el mensaje NAMES
-    std::string userList;
-    const std::set<Client*>& users = channel.getUsers();
-    for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
-        if (!userList.empty()) userList += " ";
-		// Añadir @ para operadores
-		if (channel.isOperator(*it2))
-		userList += "@";
-		userList += (*it2)->getNickname();
-	}
-    
-    // Enviar NAMES a todos los usuarios del canal para mostrar la lista actualizada
-    for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
-        Client* c = *it2;
-        std::string namesReply = ":" + serverName + " 353 " + c->getNickname() + " = " + chanName + " :" + userList;
-        std::cout << "Sending NAMES to " << c->getNickname() << ": " << namesReply << std::endl;
-        send_message(c->getFd(), namesReply);
-        std::string endNames = ":" + serverName + " 366 " + c->getNickname() + " " + chanName + " :End of /NAMES list.";
-        std::cout << "Sending: " << endNames << std::endl;
-        send_message(c->getFd(), endNames);
-    }
-}
-
-void	Server::_privMsg(Client* sender, const std::vector<std::string>& args) {
-	if (args.size() < 3) {
-		send_message(sender->getFd(), "Error: PRIVMSG necesita al menos 2 argumentos: destinatario y mensaje.");
-		return;
-	}
-	std::string target = args[1];
-	std::string message;
-	for (size_t i = 2; i < args.size(); ++i) {
-		message += args[i] + " ";
-	}
-	if (!message.empty())
-		message.erase(message.length() - 1);
-
-	if (target[0] == '#') {
-		std::map<std::string, Channel>::iterator it = _channels.find(target);
-		if (it == _channels.end()) {
-			send_message(sender->getFd(), "Error: El canal no existe.");
-			return;
-		}
-		Channel& channel = it->second;
-		if (!channel.hasUser(sender)) {
-			send_message(sender->getFd(), "Error: No estás en el canal " + target);
-			return;
-		}
-		std::string fullMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com PRIVMSG " + target + " :" + message;
-		channel.sendToChannel(fullMsg, sender);
-	} else {
-		Client* recipient = findClientByNick(target);
-		if (!recipient) {
-			send_message(sender->getFd(), "Error: Usuario no encontrado.");
-			return;
-		}
-		std::string fullMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com PRIVMSG " + target + " :" + message;
-		send_message(recipient->getFd(), fullMsg);
-	}
-}
-
-void	Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
-	if (args.size() < 2) {
-		send_message(sender->getFd(), "Error: KICK necesita un argumento.");
-		return;
-	}
-	std::string chanName = args[1];
-	std::string targetNick = args[2];
-
-	//std::cout << "HA ENTRADO EN KICKUSER CON CANAL: " << chanName << " Y TARGET: " << targetNick << std::endl;
-	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
-	if (it == _channels.end()) {
-		send_message(sender->getFd(), "Error: El canal no existe.");
-		return;
-	}
-	Channel& channel = it->second;
-	if (!channel.isOperator(sender)) {
-		std::string errorMsg = ":irc.servidor.com 482 " + sender->getNickname() + " " + chanName + " :You must be a channel operator";
-		send_message(sender->getFd(), errorMsg);
-		return;
-	}
-	Client* target = findClientByNick(targetNick);
-	if (!target || !channel.hasUser(target)) {
-		std::string errorMsg = ":irc.servidor.com 441 " + sender->getNickname() + " " + targetNick + " " + chanName + " :They aren't on that channel";
-		send_message(sender->getFd(), errorMsg);
-		return;
-	}
-	// Enviar KICK a todos (incluyendo al expulsado) ANTES de removerlo
-	std::string kickMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com KICK " + chanName + " " + targetNick;
-	sendToChannel(channel, kickMsg);
-	send_message(target->getFd(), kickMsg);
-	// Ahora remover al usuario del canal
-	channel.removeUser(target);
-	send_message(sender->getFd(), "Usuario " + targetNick + " expulsado correctamente.");
 }
 
 Client* Server::findClientByNick(const std::string& nick) {

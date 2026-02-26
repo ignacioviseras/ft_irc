@@ -12,14 +12,15 @@ class Token
     public:
 
         enum type {
+            USER, //auth
+            NICK, //auth
+            PASS, //auth
+			QUIT, //para desconectar
+            JOIN,
             KICK,
             INVITE,
             TOPIC,
             MODE,
-            PASS, //auth
-            NICK, //auth
-            USER, //auth
-            JOIN,
             PRIVMSG, // para mensajes
             UNKNOWN //se puede usar por si no existe y asi se tramita
 

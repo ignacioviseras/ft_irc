@@ -1,4 +1,4 @@
-#include "Client.hpp"
+#include "../include/Client.hpp"
 
 Client::Client() : _isRegistered(false), _isPasswordOk(false), _fd(-1) {}
 Client::Client(int fd) :  _isRegistered(false), _isPasswordOk(false), _fd(fd) {}
@@ -27,6 +27,18 @@ void Client::setUsername(const std::string &username) {
 
 void Client::setNickname(const std::string &nickname) {
     _nickname = nickname;
+}
+
+void Client::setHostname(const std::string &hostname) {
+    _hostname = hostname;
+}
+
+void Client::setServername(const std::string &servername) {
+    _servername = servername;
+}
+
+void Client::setRealname(const std::string &realname) {
+    _realname = realname;
 }
 
 std::string &Client::getNickname() {
