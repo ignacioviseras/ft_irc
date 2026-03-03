@@ -47,6 +47,7 @@ class Server
 		void _user(Client* sender, const std::vector<std::string>& args);
 		void _quit(Client* sender, const std::vector<std::string>& args);
 		void _pass(Client* sender, const std::vector<std::string>& args);
+		void _part(Client* sender, const std::vector<std::string>& args);
 		void _nick(int fd, const std::vector<std::string>& args);
 
 		void sendToChannel(const Channel& channel, const std::string& msg);

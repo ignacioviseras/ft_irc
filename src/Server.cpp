@@ -248,6 +248,10 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 			_pass(&user, args);
             break;
         }
+		case Token::PART: {
+			_part(&user, args);
+			break;
+		}
         //--------- JOIN -----------
         case Token::JOIN: {
             _join(fd, args);

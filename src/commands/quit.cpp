@@ -29,24 +29,18 @@ void Server::_quit(Client* sender, const std::vector<std::string>& args) {
 				userList += (*it2)->getNickname();
 			}
 			std::string serverName = "irc.servidor.com";
-			for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
-    		    Client* c = *it2;
-    		    std::string namesReply = ":" + serverName + " 353 " + c->getNickname() + " = " + chanName + " :" + userList;
-    		    std::cout << "Sending NAMES to " << c->getNickname() << ": " << namesReply << std::endl;
-    		    send_message(c->getFd(), namesReply);
-    		    std::string endNames = ":" + serverName + " 366 " + c->getNickname() + " " + chanName + " :End of /NAMES list.";
-    		    std::cout << "Sending: " << endNames << std::endl;
-    		    send_message(c->getFd(), endNames);
-    		}
+			sendChannelNames(&it2->second, serverName);
+			if (it2->second.getUsers().empty()) {
+				_channels.erase(it2);
+			}
 		}
+	    close(fd);
+	    _clients.erase(fd);
+	    for (size_t i = 0; i < _pollfds.size(); ++i) {
+	        if (_pollfds[i].fd == fd) {
+	            _pollfds.erase(_pollfds.begin() + i);
+	            break;
+	        }
+	    }
 	}
-
-    close(fd);
-    _clients.erase(fd);
-    for (size_t i = 0; i < _pollfds.size(); ++i) {
-        if (_pollfds[i].fd == fd) {
-            _pollfds.erase(_pollfds.begin() + i);
-            break;
-        }
-    }
 }

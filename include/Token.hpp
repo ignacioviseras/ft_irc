@@ -15,6 +15,7 @@ class Token
             USER, //auth
             NICK, //auth
             PASS, //auth
+			PART, //para salir de un canal
 			QUIT, //para desconectar
             JOIN,
             KICK,

@@ -63,6 +63,8 @@ Token::type Token_assign_type(const std::string& arg)
         return (Token::MODE);
     else if (arg == "PASS")
         return (Token::PASS);
+	else if (arg == "PART")
+        return (Token::PART);
     else if (arg == "NICK")
         return (Token::NICK);
     else if (arg == "USER")
@@ -77,6 +79,7 @@ Token::type Token_assign_type(const std::string& arg)
         return (Token::UNKNOWN);
 }
 
+// Enviar NAMES a todos los usuarios del canal para mostrar la lista actualizada
 void Server::sendChannelNames(Channel* channel, const std::string& serverName) {
 	const std::string& chanName = channel->getName();
 	std::string userList;

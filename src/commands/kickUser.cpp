@@ -33,4 +33,7 @@ void	Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
 	send_message(target->getFd(), kickMsg);
 	channel.removeUser(target);
 	send_message(sender->getFd(), "Usuario " + targetNick + " expulsado correctamente.");
+	if (channel.getUsers().empty()) {
+		_channels.erase(it);
+	}
 }

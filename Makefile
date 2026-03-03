@@ -11,6 +11,7 @@ SRCS =	src/main.cpp \
 		src/commands/user.cpp \
 		src/commands/nick.cpp \
 		src/commands/pass.cpp \
+		src/commands/part.cpp \
 		src/commands/join.cpp \
 		src/commands/privmsg.cpp \
 		src/commands/kickUser.cpp \

@@ -43,10 +43,8 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
 		userList += "@";
 		userList += (*it2)->getNickname();
 	}
-    
-	
-    // Enviar NAMES a todos los usuarios del canal para mostrar la lista actualizada
-    for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
+	//sendChannelNames(&channel, serverName);
+	for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
         Client* c = *it2;
         std::string namesReply = ":" + serverName + " 353 " + c->getNickname() + " = " + chanName + " :" + userList;
         std::cout << "Sending NAMES to " << c->getNickname() << ": " << namesReply << std::endl;
