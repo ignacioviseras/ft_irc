@@ -290,6 +290,8 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 			_privMsg(&user, args);
             break;
         case Token::UNKNOWN:
+			//sea lo que sea la gestion que hay que hacer aqui.
+			break;
         default:
             std::cerr << "Comando desconocido: " << args[0] << std::endl;
             break;

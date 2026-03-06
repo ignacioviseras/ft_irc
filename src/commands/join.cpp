@@ -39,7 +39,8 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
     std::string userList = "";
     const std::set<Client*>& users = channel.getUsers();
     for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
-        if (!userList.empty()) userList += " ";
+        if (!userList.empty())
+			userList += " ";
 		if (channel.isOperator(*it2)) userList += "@"; // Añadir @ para operadores
 		userList += (*it2)->getNickname();
 	}
