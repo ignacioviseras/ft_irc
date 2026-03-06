@@ -92,11 +92,13 @@ void	Channel::commandTopic(Client *client){
 
 void   Channel::commandMode(const std::vector<std::string>& args){
 
-    if (args.size() <= 1 || args[1].empty())
-        return;
-    char flag = args[1][0];
+    if (args.size() <= 3 || args[2].empty())
+		return;
+	std::cout << "Flag?? :: " << args[2][0] << std::endl;
+    char flag = args[2][0];
     switch (flag) {
         case 'i':
+			std::cout << "invite" << std::endl;
             this->commandModeInvite();
             break;
         case 't':
@@ -122,16 +124,19 @@ void    Channel::commandModeInvite()
     if (_inviteOnly == true)
         _inviteOnly = false;
     else
-        _inviteOnly = true;
+		_inviteOnly = true;
+	std::cout << "Canal restringido solo a invitaciones establecido en : " << _inviteOnly << std::endl;
 }
 
 void    Channel::commandModeKey(const std::vector<std::string>& args)
 {
 
 	//MUY SUJETO A CAMBIOS Y REVISION
-    if (args.size() >= 3 && !args[2].empty()) {
-        _key = args[2];
+    if (args.size() == 4 && !args[3].empty()) {
+        _key = args[3];
     }
+	std::cout << "Clave para unirse al canal ahora vale : " << _key << std::endl;
+
 }
 
 void    Channel::commandModeTopic()
@@ -140,6 +145,7 @@ void    Channel::commandModeTopic()
 		_topicRestricted = false;
 	else
 		_topicRestricted = true;
+	std::cout << "Topic restringido solo a operadores establecido en : " << _topicRestricted << std::endl;
 }
 
 void    Channel::commandModeOperator(const std::vector<std::string>& args)
@@ -152,7 +158,7 @@ void    Channel::commandModeOperator(const std::vector<std::string>& args)
 
 void    Channel::commandModeLimit(const std::vector<std::string>& args)
 {
-    if (args.size() < 3 || args[2].empty())
+    if (args.size() < 4 || args[3].empty())
         return;
 
     const char* s = args[2].c_str();
@@ -167,4 +173,5 @@ void    Channel::commandModeLimit(const std::vector<std::string>& args)
         return;
 
     _channelLimit = static_cast<int>(val);
+	std::cout << "Limite del canal establecido en : " << _channelLimit << std::endl;
 }
