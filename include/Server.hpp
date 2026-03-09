@@ -8,7 +8,6 @@
 # include <cctype>
 # include <cstdlib>
 # include <string>
-# include <poll.h>
 # include <vector>
 # include <map>
 #include <cstdio>
@@ -17,6 +16,7 @@
 #include "Utils.hpp"
 #include <fcntl.h>
 #include "Channel.hpp"
+#include <sys/epoll.h>
 
 class Server
 {
@@ -27,7 +27,9 @@ class Server
         int _serverSocket;
         std::map<int, Client> _clients;
 		std::map<std::string, Channel> _channels;
-        std::vector<pollfd> _pollfds;
+        int _epollFd;
+        struct epoll_event _events[64];
+        void handleClientWrite(int fd);
 
         void setupServerSocket();
         void handleNewConnection();

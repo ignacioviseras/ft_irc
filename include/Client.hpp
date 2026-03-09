@@ -17,6 +17,7 @@ public:
     void setRegisted(bool value);
     int getFd() const;
     std::string &getBuffer();
+    std::string &getWriteBuffer();
 
     void setNickname(const std::string &nickname);
     void setUsername(const std::string &username);
@@ -30,6 +31,7 @@ private:
     int _fd;
     
     std::string _buffer;
+    std::string _writeBuffer;
     std::string _nickname;
     std::string _username;
     std::string _hostname;

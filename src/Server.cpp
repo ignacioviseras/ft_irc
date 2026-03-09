@@ -10,12 +10,13 @@ Server::~Server() {
     close(_serverSocket);
 }
 
-void Server::setupServerSocket()
-{
+void Server::setupServerSocket() {
     _serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    // os sockets sean no bloqueantes
-    //Si un recv o un send se bloquea congelas todo el servidor para todos los usuarios
-    if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) < 0) {
+    if (_serverSocket < 0) {
+        perror("socket()");
+        exit(1);
+    }
+    if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) < 0) {//socket no bloqueante
         perror("fcntl()");
         exit(1);
     }
@@ -32,42 +33,68 @@ void Server::setupServerSocket()
         perror("bind()");
         exit(1);
     }
-
     if (listen(_serverSocket, SOMAXCONN) < 0) {
         perror("listen()");
         exit(1);
     }
 
-    pollfd serverPoll;
-    serverPoll.fd = _serverSocket;
-    serverPoll.events = POLLIN;
-    _pollfds.push_back(serverPoll);
-    pollfd stdinPoll;
-    stdinPoll.fd = STDIN_FILENO; // FD 0
-    stdinPoll.events = POLLIN;
-    _pollfds.push_back(stdinPoll);
+    _epollFd = epoll_create1(0);
+    if (_epollFd == -1) {
+        perror("epoll_create1");
+        exit(1);
+    }
 
-    std::cout << "Servidor iniciado en puerto " << _port << std::endl;
+    // anadimos _serverSocket al epoll
+    struct epoll_event ev;
+    std::memset(&ev, 0, sizeof(ev));
+    ev.events = EPOLLIN;
+    ev.data.fd = _serverSocket;
+    if (epoll_ctl(_epollFd, EPOLL_CTL_ADD, _serverSocket, &ev) == -1) {
+        perror("epoll_ctl: serverSocket");
+        exit(1);
+    }
+
+    // añadimos STDIN al epoll
+    ev.data.fd = STDIN_FILENO;
+    if (epoll_ctl(_epollFd, EPOLL_CTL_ADD, STDIN_FILENO, &ev) == -1) {
+        perror("epoll_ctl: stdin");
+    }
+
+    std::cout << "Servidor IRC con epoll iniciado en puerto " << _port << std::endl;
 }
 
-void Server::run()
-{
-    while (_running)
-    {
-        int activity = poll(&_pollfds[0], _pollfds.size(), -1);
-        if (activity < 0) {
-            perror("poll()");
-            exit(1);
-        }
+void Server::run() {
+    struct epoll_event events[64]; // donde epoll_wait dejará los resultados
 
-        for (size_t i = 0; i < _pollfds.size(); ++i) {
-            if (_pollfds[i].revents & POLLIN) {
-                if (_pollfds[i].fd == _serverSocket)
+    while (_running) {
+        int nfds = epoll_wait(_epollFd, events, 64, -1);
+        if (nfds < 0)
+            break;
+
+        for (int i = 0; i < nfds; ++i) {
+            int fd = events[i].data.fd;
+
+            // manejo de errores o desconexiones
+            if (events[i].events & (EPOLLERR | EPOLLHUP)) {
+                std::cout << "Error/HUP en FD " << fd << ": Desconectando......." << std::endl;
+                close(fd);
+                _clients.erase(fd);
+                continue;
+            }
+
+            // manejo de lectura
+            if (events[i].events & EPOLLIN) {
+                if (fd == _serverSocket)
                     handleNewConnection();
-                else if (_pollfds[i].fd == STDIN_FILENO)
+                else if (fd == STDIN_FILENO)
                     handleStdin();
                 else
-                    handleClientData(_pollfds[i].fd);
+                    handleClientData(fd);
+            }
+
+            // manejo de escritura     solo si hay algo en el buffer del cliente
+            if (events[i].events & EPOLLOUT) {
+                handleClientWrite(fd);
             }
         }
     }
@@ -78,21 +105,28 @@ void Server::handleNewConnection() {
     socklen_t addrSize = sizeof(clientAddr);
 
     int clientFd = accept(_serverSocket, (sockaddr *)&clientAddr, &addrSize);
-    // os sockets sean no bloqueantes
     // Si un recv o un send se bloquea congelas todo el servidor para todos los usuarios
+    if (clientFd < 0) {
+        perror("accept()");
+        return;
+    }
     if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
         perror("fcntl()");
         close(clientFd);
         return;
     }
 
-    std::cout << "Cliente conectado! FD = " << clientFd << std::endl;
+    std::cout << "Nuevo cliente: FD " << clientFd << std::endl;
     _clients.insert(std::make_pair(clientFd, Client(clientFd)));
-
-    pollfd clientPoll;
-    clientPoll.fd = clientFd;
-    clientPoll.events = POLLIN;
-    _pollfds.push_back(clientPoll);
+    struct epoll_event ev;
+    std::memset(&ev, 0, sizeof(ev));
+    ev.events = EPOLLIN; // Solo lectura al principio
+    ev.data.fd = clientFd;
+    if (epoll_ctl(_epollFd, EPOLL_CTL_ADD, clientFd, &ev) == -1) {
+        perror("epoll_ctl: add client");
+        close(clientFd);
+        _clients.erase(clientFd);
+    }
 }
 
 void Server::handleStdin() {
@@ -126,12 +160,6 @@ void Server::handleClientData(int fd) {
         std::cout << "Cliente desconectado FD = " << fd << std::endl;
         close(fd);
         _clients.erase(fd);
-        for (size_t i = 0; i < _pollfds.size(); ++i) {
-            if (_pollfds[i].fd == fd) {
-                _pollfds.erase(_pollfds.begin() + i);
-                break;
-            }
-        }
         return;
     }
     _clients[fd].getBuffer().append(buffer, bytesRead);// acumulamos los datos
@@ -183,10 +211,55 @@ bool Server::nicknameInUse(const std::string& nick) {
     return false;
 }
 
+void Server::handleClientWrite(int fd) {
+    if (_clients.find(fd) == _clients.end())
+        return;
+
+    Client &user = _clients[fd];
+    std::string &buffer = user.getWriteBuffer();
+    if (buffer.empty()) {// si el buffer esta vacio quitamos EPOLLOUT
+        struct epoll_event ev;
+        std::memset(&ev, 0, sizeof(ev));
+        ev.events = EPOLLIN;
+        ev.data.fd = fd;
+        epoll_ctl(_epollFd, EPOLL_CTL_MOD, fd, &ev);
+        return;
+    }
+
+    ssize_t bytesSent = send(fd, buffer.c_str(), buffer.length(), 0);
+    if (bytesSent > 0)
+        buffer.erase(0, bytesSent); // quiraqmos del buffer lo que se envió
+    else if (bytesSent < 0) {// Si da 0 o negativo, cerramos la conexión SIN mirar errno
+        perror("send()");
+        close(fd);
+        _clients.erase(fd);
+        return;
+    }
+    
+
+    // quitamos EPOLLOUT solo cuando el buffer este vacio
+    if (buffer.empty()) {
+        struct epoll_event ev;
+        std::memset(&ev, 0, sizeof(ev));
+        ev.events = EPOLLIN;  // cambiuanos EPOLLOUT a EPOLLIN
+        ev.data.fd = fd;
+        epoll_ctl(_epollFd, EPOLL_CTL_MOD, fd, &ev);
+    }
+}
+
 void Server::send_message(int fd, std::string message) {
-    std::string full_message = message + "\r\n";
-    if (send(fd, full_message.c_str(), full_message.length(), 0) == -1) {
-        std::cerr << "Error enviando mensaje al fd: " << fd << std::endl;
+    if (_clients.find(fd) == _clients.end())
+        return;
+
+    Client &user = _clients[fd];
+    struct epoll_event ev;
+
+    user.getWriteBuffer().append(message + "\r\n");
+    std::memset(&ev, 0, sizeof(ev));
+    ev.events = EPOLLIN | EPOLLOUT; //dmoificamos el registro para decirle a epoll que queremos escribir (EPOLLOUT)
+    ev.data.fd = fd;
+    if (epoll_ctl(_epollFd, EPOLL_CTL_MOD, fd, &ev) == -1) {
+        perror("epoll_ctl: mod EPOLLOUT");
     }
 }
 

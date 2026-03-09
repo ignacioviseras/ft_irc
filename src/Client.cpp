@@ -13,6 +13,10 @@ std::string &Client::getBuffer() {
     return _buffer;
 }
 
+std::string &Client::getWriteBuffer() {
+    return _writeBuffer;
+}
+
 bool Client::isRegisted() const {
     return _isPasswordOk && !_nickname.empty() && !_username.empty();
 }

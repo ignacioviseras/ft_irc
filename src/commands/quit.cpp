@@ -64,12 +64,12 @@ void Server::_quit(Client* sender, const std::vector<std::string>& args) {
 	// Cerrar la conexión del cliente y limpiar recursos
 	std::cout << "Cerrando conexión del cliente " << sender->getNickname() << " (fd: " << fd << ")" << std::endl;
 
-	for (size_t i = 0; i < _pollfds.size(); ++i) {
-	    if (_pollfds[i].fd == fd) {
-	        _pollfds.erase(_pollfds.begin() + i);
-	        break;
-	    }
-	}
+	// for (size_t i = 0; i < _pollfds.size(); ++i) {
+	//     if (_pollfds[i].fd == fd) {
+	//         _pollfds.erase(_pollfds.begin() + i);
+	//         break;
+	//     }
+	// }
 	close(fd);
 	_clients.erase(fd);
 }
