@@ -1,0 +1,17 @@
+#!/usr/bin/expect
+
+set timeout 2
+set nickname [lindex $argv 0]
+set username [lindex $argv 1]
+
+spawn nc -v 127.0.0.1 6667
+
+send -- "PASS asd\r"
+sleep 2
+send -- "NICK $nickname\r"
+send -- "USER $username 2 3 :4\r"
+expect ": 001 :Welcome to the Internet Relay Network $nickname!\r"
+interact
+# while (1) {
+#	 sleep 300
+# }

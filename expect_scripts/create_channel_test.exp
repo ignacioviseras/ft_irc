@@ -1,0 +1,18 @@
+#!/usr/bin/expect
+# Should we set a max channels for the server?????
+
+set timeout 2
+spawn nc -v 127.0.0.1 6667
+
+send -- "PASS asd\r"
+sleep 2
+send -- "NICK pacopiza\r"
+send -- "USER pacopiza 2 3 :4\r"
+expect ": 001 :Welcome to the Internet Relay Network pacopiza!\r"
+
+for {set i 0} {$i < 100} {incr i} {
+	send -- "JOIN #$i\r"
+#	expect ": 331 #elpacochannel_$i :No topic is set\r"
+#	expect ": 353 #elpacochannel_$i :pacopiza\r"
+}
+interact
