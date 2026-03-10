@@ -21,12 +21,16 @@ void	Server::_privMsg(Client* sender, const std::vector<std::string>& args) {
 	if (target[0] == '#') {
 		std::map<std::string, Channel>::iterator it = _channels.find(target);
 		if (it == _channels.end()) {
-			send_message(sender->getFd(), "Error: El canal no existe.");
+			std::string errorMsg = ":irc.servidor.com 403 " + sender->getNickname() + " " + target + " :No such channel";
+			send_message(sender->getFd(), errorMsg);
+			//send_message(sender->getFd(), "Error: El canal no existe.");
 			return;
 		}
 		Channel& channel = it->second;
 		if (!channel.hasUser(sender)) {
-			send_message(sender->getFd(), "Error: No estás en el canal " + target);
+			std::string errorMsg = ":irc.servidor.com 404 " + sender->getNickname() + " " + target + " :Cannot send to channel";
+			send_message(sender->getFd(), errorMsg);
+			//send_message(sender->getFd(), "Error: No estás en el canal " + target);
 			return;
 		}
 		std::string fullMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com PRIVMSG " + target + " :" + message;
@@ -34,7 +38,9 @@ void	Server::_privMsg(Client* sender, const std::vector<std::string>& args) {
 	} else {
 		Client* recipient = findClientByNick(target);
 		if (!recipient) {
-			send_message(sender->getFd(), "Error: Usuario no encontrado.");
+			std::string errorMsg = ":irc.servidor.com 401 " + sender->getNickname() + " " + target + " :No such nick/channel";
+			send_message(sender->getFd(), errorMsg);
+			//send_message(sender->getFd(), "Error: Usuario no encontrado.");
 			return;
 		}
 		std::string fullMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com PRIVMSG " + target + " :" + message;

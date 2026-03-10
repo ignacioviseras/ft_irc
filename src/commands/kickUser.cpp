@@ -12,7 +12,9 @@ void	Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
 	//std::cout << "HA ENTRADO EN KICKUSER CON CANAL: " << chanName << " Y TARGET: " << targetNick << std::endl;
 	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
 	if (it == _channels.end()) {
-		send_message(sender->getFd(), "Error: El canal no existe.");
+		std::string errorMsg = ":irc.servidor.com 403 " + sender->getNickname() + " " + chanName + " :No such channel";
+		send_message(sender->getFd(), errorMsg);
+		//send_message(sender->getFd(), "Error: El canal no existe.");
 		return;
 	}
 	Channel& channel = it->second;

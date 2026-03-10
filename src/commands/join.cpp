@@ -2,7 +2,9 @@
 
 void	Server::_join(int fd, const std::vector<std::string>& args) {
 	if (args.size() < 2) {
-		send_message(fd, "Error: JOIN necesita un nombre de canal.");
+        std::string errorMsg = ":irc.servidor.com 461 " + _clients[fd].getNickname() + " JOIN :Not enough parameters";
+        send_message(fd, errorMsg);
+        //send_message(fd, "Error: JOIN necesita un nombre de canal.");
 		return;
 	}
 
@@ -19,7 +21,8 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
     
     Channel& channel = _channels.find(chanName)->second;
     if (channel.hasUser(&user)) {
-        send_message(fd, "Error: Ya estás en el canal " + chanName);
+        std::string errorMsg = ":irc.servidor.com 443 " + user.getNickname() + " " + chanName + " :is already on channel";
+        send_message(fd, errorMsg);
         return;
     }
 

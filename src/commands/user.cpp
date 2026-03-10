@@ -2,7 +2,9 @@
 
 void Server::_user(Client* sender, const std::vector<std::string>& args) {
 	if (args.size() < 5) {
-		send_message(sender->getFd(), "Error: USER necesita 4 parámetros 'USER <username> <hostname> <servername> :<realname>'");
+		std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " USER :Not enough parameters";
+		send_message(sender->getFd(), errorMsg);
+		//send_message(sender->getFd(), "Error: USER necesita 4 parámetros 'USER <username> <hostname> <servername> :<realname>'");
 		return;
 	}
 	std::string username = args[1];
