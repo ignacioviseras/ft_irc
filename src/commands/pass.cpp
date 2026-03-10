@@ -3,14 +3,19 @@
 void Server::_pass(Client* sender, const std::vector<std::string>& args) {
     int fd = sender->getFd();
     if (args.size() < 2) {
-        send_message(fd, "Error: PASS necesita la contraseña.");
+        std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " PASS :Not enough parameters";
+        send_message(fd, errorMsg);
         return;
     }
-    if (sender->isRegisted())
-        return send_message(fd, "Error: Ya estás registrado, no puedes usar PASS.");
+    if (sender->isRegisted()) {
+        std::string errorMsg = ":irc.servidor.com 462 " + sender->getNickname() + " :Unauthorized command (already registered)";
+        return send_message(fd, errorMsg);
+    }
     if (args[1] == this->_password) {
         sender->_isPasswordOk = true;
         send_message(fd, "password okey");
-    } else 
-        send_message(fd, "Error: password");
+    } else {
+        std::string errorMsg = ":irc.servidor.com 464 " + sender->getNickname() + " :Password incorrect";
+        send_message(fd, errorMsg);
+    }
 }
