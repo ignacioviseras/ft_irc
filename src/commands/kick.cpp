@@ -1,6 +1,6 @@
 #include "../../include/Server.hpp"
 
-void	Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
+void	Server::_kick(Client* sender, const std::vector<std::string>& args) {
 	if (args.size() < 3) {
 		std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " KICK :Not enough parameters";
 		send_message(sender->getFd(), errorMsg);
@@ -9,7 +9,7 @@ void	Server::_kickUser(Client* sender, const std::vector<std::string>& args) {
 	std::string chanName = args[1];
 	std::string targetNick = args[2];
 
-	//std::cout << "HA ENTRADO EN KICKUSER CON CANAL: " << chanName << " Y TARGET: " << targetNick << std::endl;
+	//std::cout << "HA ENTRADO EN KICK CON CANAL: " << chanName << " Y TARGET: " << targetNick << std::endl;
 	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
 	if (it == _channels.end()) {
 		std::string errorMsg = ":irc.servidor.com 403 " + sender->getNickname() + " " + chanName + " :No such channel";
