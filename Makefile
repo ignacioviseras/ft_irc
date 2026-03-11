@@ -13,8 +13,9 @@ SRCS =	src/main.cpp \
 		src/commands/pass.cpp \
 		src/commands/part.cpp \
 		src/commands/join.cpp \
+		src/commands/names.cpp \
 		src/commands/privmsg.cpp \
-		src/commands/kickUser.cpp \
+		src/commands/kick.cpp \
 		src/commands/quit.cpp
 
 OBJS = $(SRCS:.cpp=.o)

@@ -77,8 +77,7 @@ void Server::run() {
             // manejo de errores o desconexiones
             if (events[i].events & (EPOLLERR | EPOLLHUP)) {
                 std::cout << "Error/HUP en FD " << fd << ": Desconectando......." << std::endl;
-                close(fd);
-                _clients.erase(fd);
+                disconnectClient(fd);
                 continue;
             }
 
@@ -158,8 +157,7 @@ void Server::handleClientData(int fd) {
     ssize_t bytesRead = recv(fd, buffer, sizeof(buffer) - 1, 0);
     if (bytesRead <= 0) {
         std::cout << "Cliente desconectado FD = " << fd << std::endl;
-        close(fd);
-        _clients.erase(fd);
+        disconnectClient(fd);
         return;
     }
     _clients[fd].getBuffer().append(buffer, bytesRead);// acumulamos los datos
@@ -231,8 +229,7 @@ void Server::handleClientWrite(int fd) {
         buffer.erase(0, bytesSent); // quiraqmos del buffer lo que se envió
     else if (bytesSent < 0) {// Si da 0 o negativo, cerramos la conexión SIN mirar errno
         perror("send()");
-        close(fd);
-        _clients.erase(fd);
+        disconnectClient(fd);
         return;
     }
     
@@ -264,11 +261,12 @@ void Server::send_message(int fd, std::string message) {
 }
 
 void Server::checkRegistration(int fd, Client &user) {
-    if (user._isPasswordOk && !user.getUsername().empty() && !user.getNickname().empty() && !user.isRegisted()) {
-        user.setRegisted(true);
-        std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE: " << user.getNickname() << " ---" << std::endl;
-        std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network"; // no se como poner los logs tanto en serv como en client
-        send_message(fd, welcome);
+    if (user.isRegisted()) {
+        if (!user._isRegistered) {
+            user.setRegisted(true);
+            std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network"; // no se como poner los logs tanto en serv como en client
+            send_message(fd, welcome);
+        }
     }
 }
 
@@ -299,12 +297,12 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 	}
     Client& user = _clients[fd];
     if (!user._isPasswordOk && cmdType != Token::PASS) {
-        send_message(fd, "Para autenticarse pruebe PASS <passwd>");
+        send_message(fd, ":irc.servidor.com 451 * :You have not registered PASS <passwd>.");
         return; 
     }
     if (user._isPasswordOk && !user.isRegisted() && 
     cmdType != Token::NICK && cmdType != Token::USER && cmdType != Token::PASS) {
-        send_message(fd, "Error: Completa tu registro con NICK y USER.");
+        send_message(fd, ":irc.servidor.com 451 * :You have not registered NICK y USER.");
         return;
     }
 	Channel *c = findServer(args);
@@ -336,7 +334,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         //--------- KICK -----------
         case Token::KICK:
 		{ 
-			_kickUser(&user, args);
+			_kick(&user, args);
             break;
 		}
         //--------- INVITE -----------
@@ -360,6 +358,10 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             _quit(&user, args);
 			break;
 		}
+        case Token::NAMES: {
+            _names(fd, args);
+            break;
+        }
         //--------- PRIVMSG -----------
         case Token::PRIVMSG:
             std::cout << "Ejecutando lógica de PRIVMSG..." << std::endl;
@@ -388,4 +390,35 @@ void Server::sendToChannel(const Channel& channel, const std::string& msg) {
     for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
         send_message((*it)->getFd(), msg);
     }
+}
+
+void Server::disconnectClient(int fd) {
+    std::map<int, Client>::iterator clientIt = _clients.find(fd);
+    if (clientIt == _clients.end())
+        return;
+
+    Client* client = &clientIt->second;
+    
+    // Remove client from all channels
+    std::vector<std::string> channelsToRemove;
+    for (std::map<std::string, Channel>::iterator chanIt = _channels.begin(); 
+         chanIt != _channels.end(); ++chanIt) {
+        if (chanIt->second.hasUser(client)) {
+            chanIt->second.removeUser(client);
+            // Mark empty channels for removal
+            if (chanIt->second.getUsers().empty()) {
+                channelsToRemove.push_back(chanIt->first);
+            }
+        }
+    }
+    
+    // Remove empty channels
+    for (std::vector<std::string>::iterator it = channelsToRemove.begin(); 
+         it != channelsToRemove.end(); ++it) {
+        _channels.erase(*it);
+    }
+    
+    // Close the socket and remove from clients map
+    close(fd);
+    _clients.erase(fd);
 }

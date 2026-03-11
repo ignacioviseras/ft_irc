@@ -1,0 +1,43 @@
+#!/usr/bin/expect
+
+set timeout 2
+spawn nc -v 127.0.0.1 6667
+
+send -- "PASS asd\r"
+sleep 2
+send -- "NICK pizapaco\r"
+sleep 2
+send -- "USER 1 2 3 :4\r"
+send -- "JOIN #elpacochannel\r"
+sleep 2
+send -- "TOPIC #elpacochannel ay paquito\r"
+sleep 2
+send -- "JOIN #asd\r"
+sleep 2
+send -- "TOPIC #asd tus castas paco\r"
+sleep 2
+send -- "JOIN #perro\r"
+sleep 2
+send -- "TOPIC #perro Guau Guau\r"
+sleep 2
+send -- "JOIN #ignacio\r"
+sleep 2
+send -- "TOPIC #ignacio Los nachos son los de comer\r"
+sleep 2
+send -- "MODE #asd +s\r"
+sleep 2
+send -- "MODE #perro +p\r"
+sleep 2
+send -- "MODE #123 +sp\r"
+send -- "NAMES\r"
+sleep 2
+send -- "LIST\r"
+
+interact
+
+
+## ERRORES
+
+## Eliminar un modo que no está seteado
+## Añadir un modo dos o más veces
+## Añadir muchos + o -

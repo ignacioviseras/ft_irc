@@ -44,7 +44,8 @@ class Server
 
 		void _join(int fd, const std::vector<std::string>& args);
 		void _privMsg(Client* sender, const std::vector<std::string>& args);
-		void _kickUser(Client* sender, const std::vector<std::string>& args);
+		void _kick(Client* sender, const std::vector<std::string>& args);
+        void _names(int fd, const std::vector<std::string>& args);
 
 		void _user(Client* sender, const std::vector<std::string>& args);
 		void _quit(Client* sender, const std::vector<std::string>& args);
@@ -56,6 +57,7 @@ class Server
 		void sendChannelNames(Channel* channel, const std::string& serverName);
 
 		Client* findClientByNick(const std::string& nick);
+		void disconnectClient(int fd);
 
 		//mixi
 

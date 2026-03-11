@@ -73,6 +73,8 @@ Token::type Token_assign_type(const std::string& arg)
         return (Token::JOIN);
     else if (arg == "PRIVMSG")
         return (Token::PRIVMSG);
+    else if (arg == "NAMES")
+        return (Token::NAMES);
 	else if (arg == "QUIT")
 		return (Token::QUIT);
     else
