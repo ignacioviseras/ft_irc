@@ -261,11 +261,12 @@ void Server::send_message(int fd, std::string message) {
 }
 
 void Server::checkRegistration(int fd, Client &user) {
-    if (user._isPasswordOk && !user.getUsername().empty() && !user.getNickname().empty() && !user.isRegisted()) {
-        user.setRegisted(true);
-        std::cout << "--- USUARIO REGISTRADO COMPLETAMENTE: " << user.getNickname() << " ---" << std::endl;
-        std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network"; // no se como poner los logs tanto en serv como en client
-        send_message(fd, welcome);
+    if (user.isRegisted()) {
+        if (!user._isRegistered) {
+            user.setRegisted(true);
+            std::string welcome = ":irc.servidor.com 001 " + user.getNickname() + " :Welcome to the IRC Network"; // no se como poner los logs tanto en serv como en client
+            send_message(fd, welcome);
+        }
     }
 }
 
@@ -296,12 +297,12 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 	}
     Client& user = _clients[fd];
     if (!user._isPasswordOk && cmdType != Token::PASS) {
-        send_message(fd, "Para autenticarse pruebe PASS <passwd>");
+        send_message(fd, ":irc.servidor.com 451 * :You have not registered PASS <passwd>.");
         return; 
     }
     if (user._isPasswordOk && !user.isRegisted() && 
     cmdType != Token::NICK && cmdType != Token::USER && cmdType != Token::PASS) {
-        send_message(fd, "Error: Completa tu registro con NICK y USER.");
+        send_message(fd, ":irc.servidor.com 451 * :You have not registered NICK y USER.");
         return;
     }
 	Channel *c = findServer(args);
