@@ -1,10 +1,14 @@
 #include "../../include/Server.hpp"
 
 void Server::_user(Client* sender, const std::vector<std::string>& args) {
-	if (args.size() < 5) {
-		std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " USER :Not enough parameters";
-		send_message(sender->getFd(), errorMsg);
-		//send_message(sender->getFd(), "Error: USER necesita 4 parámetros 'USER <username> <hostname> <servername> :<realname>'");
+	if (args.size() != 5) {
+		if (args.size() < 5) {
+			std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " USER :Not enough parameters";
+			send_message(sender->getFd(), errorMsg);
+		} else {
+			std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " USER :Too many parameters";
+			send_message(sender->getFd(), errorMsg);
+		}
 		return;
 	}
 	std::string username = args[1];

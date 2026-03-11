@@ -1,29 +1,22 @@
-~~OPERADORES~~
-~~Poner que el primer usuario sea operador~~
-~~Gestionar arroba~~
-
 COMANDOS
-~~Terminar el switch~~
-comandos: DONE A FALTA DE TEST Y ESPECIDFICOS
-- Kick
-- Invite
-- ~~Topic~~
+
+
+- PASS ✅
+- USER
+	- Pendiente parseo de argumentos 2 y 3
+	- Que no se pueda usar una vez registrado
+- NICK
+	- Código de error 432 (Definir cuándo ocurre)
+
+
+
+
 - Mode:
 	- i
 	- t
 	- k
 	- o* (Ver con los operadores) FALTA
 	- l FALTA
-
-CONECTARSE CON DOS CLIENTES
-- ~~El server sí lo recibe, no se ve reflejado en el otro cliente~~
-- ~~Sólo se conecta el cliente WSL al canal si ponemos el nombre del canal con (cosa que no hace falta en HexChat)~~
-- ~~Los mensajes no se enseñan en el otro cliente~~
-
-
-COMANDOS
-
-- QUIT
 
 EXTRAS
 
