@@ -1,15 +1,22 @@
+# Vamos a escribir todo lo que tenemos pendiente.
+# Propongo que todo lo que esté hecho lo comprobemos con HexChat (cliente de referencia) y nc,
+# poner un ✅ cada vez que verifiquemos que algo funcione. 
+
+
 COMANDOS
 
-
-- PASS ✅
+- PASS = HexChat✅ Netcat ✅
 - USER
 	- Pendiente parseo de argumentos 2 y 3
 	- Que no se pueda usar una vez registrado
 - NICK
 	- Código de error 432 (Definir cuándo ocurre)
 
+- KICK
+	- A lo mejor no hay que enviar los nombres de todos los usuarios del canal cada vez que se une alguien? (Sin olvidar la lista de la derecha)
+	- Echar a un cliente desde fuera del canal no va?
 
-
+- NAMES = HexChat✅ Netcat ✅
 
 - Mode:
 	- i
