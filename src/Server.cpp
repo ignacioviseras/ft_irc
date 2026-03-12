@@ -7,7 +7,14 @@ Server::Server(int port, const std::string &password): _port(port), _password(pa
 }
 
 Server::~Server() {
-    close(_serverSocket);
+    for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        close(it->first);
+    }
+    _clients.clear();
+    if (_epollFd != -1)
+        close(_epollFd);
+    if (_serverSocket != -1)
+        close(_serverSocket);
 }
 
 void Server::setupServerSocket() {
@@ -404,10 +411,7 @@ void Server::disconnectClient(int fd) {
     std::map<int, Client>::iterator clientIt = _clients.find(fd);
     if (clientIt == _clients.end())
         return;
-
     Client* client = &clientIt->second;
-    
-    // Remove client from all channels
     std::vector<std::string> channelsToRemove;
     for (std::map<std::string, Channel>::iterator chanIt = _channels.begin(); 
          chanIt != _channels.end(); ++chanIt) {
@@ -419,14 +423,11 @@ void Server::disconnectClient(int fd) {
             }
         }
     }
-    
-    // Remove empty channels
     for (std::vector<std::string>::iterator it = channelsToRemove.begin(); 
          it != channelsToRemove.end(); ++it) {
         _channels.erase(*it);
     }
-    
-    // Close the socket and remove from clients map
+    epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL);
     close(fd);
     _clients.erase(fd);
 }
