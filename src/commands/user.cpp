@@ -14,12 +14,17 @@ void Server::_user(Client* sender, const std::vector<std::string>& args) {
 	std::string username = args[1];
 	std::string hostname = args[2];
 	std::string servername = args[3];
+	//no encuentro nada en rfc q me diga la necesida de obligar los campos 0 y * ejmpl(USER david 0 * :david)
+	// if (hostname != "0" && servername != "*"){
+	// 	std::string errorMsg = ":irc.servidor.com **** " + sender->getNickname() + "Error in params param 3 0 and param 4 *";
+	// 	send_message(sender->getFd(), errorMsg);
+	// }
 	std::string realname;
 	for (size_t i = 4; i < args.size(); ++i) {
 		realname += args[i] + " ";
 	}
-	if (!realname.empty())
-		realname.erase(realname.length() - 1);
+	if (!realname.empty() && realname[0] == ':')
+    	realname.erase(0, 1);
 	sender->setUsername(username);
 	sender->setHostname(hostname);
 	sender->setServername(servername);
