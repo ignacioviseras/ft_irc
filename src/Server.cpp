@@ -300,6 +300,14 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         send_message(fd, ":irc.servidor.com 451 * :You have not registered PASS <passwd>.");
         return; 
     }
+    if (cmdType == Token::PASS && user._isPasswordOk) {
+        send_message(fd, ":irc.servidor.com 462 " + user.getNickname() + " :You may not reregister");
+        return;
+    }
+    if (cmdType == Token::USER && !user.getUsername().empty()) {
+        send_message(fd, ":irc.servidor.com 462 " + user.getNickname() + " :You may not reregister");
+        return;
+    }
     if (user._isPasswordOk && !user.isRegisted() && 
     cmdType != Token::NICK && cmdType != Token::USER && cmdType != Token::PASS) {
         send_message(fd, ":irc.servidor.com 451 * :You have not registered NICK y USER.");
