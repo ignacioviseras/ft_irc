@@ -1,6 +1,10 @@
 #include "../include/Utils.hpp"
 #include "../include/Server.hpp"
 
+static bool isPrintableAscii(unsigned char ch) {
+    return ch >= 33 && ch <= 126;
+}
+
 //split guarro joseado para salir del paso
 std::vector<std::string> split(const std::string& s, const std::string& delimiter) {
     std::vector<std::string> Tokens;
@@ -79,6 +83,40 @@ Token::type Token_assign_type(const std::string& arg)
 		return (Token::QUIT);
     else
         return (Token::UNKNOWN);
+}
+
+std::string normalizeChannelName(const std::string& rawName)
+{
+    std::string cleaned;
+
+    for (std::string::const_iterator it = rawName.begin(); it != rawName.end(); ++it) {
+        unsigned char ch = static_cast<unsigned char>(*it);
+
+        if (!isPrintableAscii(ch))
+            continue;
+        if (ch == ',' || ch == ':')
+            continue;
+        cleaned += static_cast<char>(ch);
+    }
+
+    if (cleaned.empty())
+        return cleaned;
+    if (cleaned[0] != '#')
+        cleaned.insert(cleaned.begin(), '#');
+    return cleaned;
+}
+
+bool isValidChannelName(const std::string& channelName)
+{
+    if (channelName.length() < 2 || channelName[0] != '#')
+        return false;
+    for (std::string::const_iterator it = channelName.begin() + 1; it != channelName.end(); ++it) {
+        unsigned char ch = static_cast<unsigned char>(*it);
+
+        if (!isPrintableAscii(ch) || ch == ',' || ch == ':')
+            return false;
+    }
+    return true;
 }
 
 // Enviar NAMES a todos los usuarios del canal para mostrar la lista actualizada

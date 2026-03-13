@@ -281,10 +281,13 @@ void Server::checkRegistration(int fd, Client &user) {
 
 Channel* Server::findServer(const std::vector<std::string>& args)
 {
-	if (args.size() < 2 || args[1] == "" || args[1][0] != '#') {
+    if (args.size() < 2) {
 		return NULL;
 	}
-	std::string chanName = args[1];
+    std::string chanName = normalizeChannelName(args[1]);
+    if (!isValidChannelName(chanName)) {
+        return NULL;
+    }
 	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
 	if (it == _channels.end()) {
 		_channels.insert(std::make_pair(chanName, Channel(chanName)));

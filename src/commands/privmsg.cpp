@@ -18,7 +18,15 @@ void	Server::_privMsg(Client* sender, const std::vector<std::string>& args) {
 	if (!message.empty())
 		message.erase(message.length() - 1);
 
-	if (target[0] == '#') {
+	// TODO: Esto no está repetido?
+	// El código de error es correcto?
+	if (!target.empty() && (target[0] == '#' || target.find('#') != std::string::npos)) {
+		target = normalizeChannelName(target);
+		if (!isValidChannelName(target)) {
+			std::string errorMsg = ":irc.servidor.com 403 " + sender->getNickname() + " " + args[1] + " :No such channel";
+			send_message(sender->getFd(), errorMsg);
+			return;
+		}
 		std::map<std::string, Channel>::iterator it = _channels.find(target);
 		if (it == _channels.end()) {
 			std::string errorMsg = ":irc.servidor.com 403 " + sender->getNickname() + " " + target + " :No such channel";

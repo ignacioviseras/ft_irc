@@ -10,9 +10,13 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
 
     Client& user = _clients[fd];
 
-    std::string chanName = args[1];
-    // Añadir # al nombre del canal si no lo tiene
-    if (chanName[0] != '#') chanName = "#" + chanName;
+    // TODO: Este error es correcto? Si el canal no existe se crea, no? O solo si el nombre es inválido?
+    std::string chanName = normalizeChannelName(args[1]);
+    if (!isValidChannelName(chanName)) {
+        std::string errorMsg = ":irc.servidor.com 403 " + user.getNickname() + " " + args[1] + " :No such channel";
+        send_message(fd, errorMsg);
+        return;
+    }
     
     if (_channels.find(chanName) == _channels.end()) {
         _channels.insert(std::make_pair(chanName, Channel(chanName)));

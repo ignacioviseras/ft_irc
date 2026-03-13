@@ -10,9 +10,13 @@ void Server::_names(int fd, const std::vector<std::string>& args) {
 		return;
 	}
 
-	std::string chanName = args[1];
-	// Add # to channel name if not present
-	if (chanName[0] != '#') chanName = "#" + chanName;
+	// TODO: Esto no está repetido?
+	std::string chanName = normalizeChannelName(args[1]);
+	if (!isValidChannelName(chanName)) {
+		std::string endNames = ":" + serverName + " 366 " + user.getNickname() + " " + args[1] + " :End of /NAMES list.";
+		send_message(fd, endNames);
+		return;
+	}
 
 	// Check if channel exists
 	if (_channels.find(chanName) == _channels.end()) {
