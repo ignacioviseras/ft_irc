@@ -92,10 +92,20 @@ void	Channel::commandTopic(Client *client){
 
 void   Channel::commandMode(const std::vector<std::string>& args){
 
-    if (args.size() <= 3 || args[2].empty())
+	// Debug: print incoming args, vector size and each argument length
+    std::cout << "commandMode args (count=" << args.size() << ", capacity=" << args.capacity() << "):";
+    for (size_t i = 0; i < args.size(); ++i) {
+        std::cout << " [" << i << "]=\"" << args[i] << "\"(len=" << args[i].size() << ")";
+    }
+    std::cout << std::endl;
+    if (args.size() <= 2 || args[2].empty())
+	{
+		std::cout << "los primos nos fuiimos" << std::endl;
 		return;
-	std::cout << "Flag?? :: " << args[2][0] << std::endl;
-    char flag = args[2][0];
+
+	}
+	std::cout << "Flag?? :: " << args[2] << std::endl;
+    char flag = args[2].at(0);
     switch (flag) {
         case 'i':
 			std::cout << "invite" << std::endl;
@@ -116,6 +126,7 @@ void   Channel::commandMode(const std::vector<std::string>& args){
         default:
             // Unknown flag
             break;
+
     }
 }
 
@@ -147,12 +158,28 @@ void    Channel::commandModeTopic()
 		_topicRestricted = true;
 	std::cout << "Topic restringido solo a operadores establecido en : " << _topicRestricted << std::endl;
 }
-
 void    Channel::commandModeOperator(const std::vector<std::string>& args)
 {
-	(void) args;
-	//implementar la forma en la que se generan los operadores pero a la ionversa
-	//acordarse de quitar/poner operadores en las respectivas listas de cada sitio (lista de canales en cliente) (lista de operadores en canal)
+	
+	const std::set<Client*>& users = this->getUsers();
+	Client* c = NULL;
+
+	//HAY QUE COMPROBAR MUCHAS COSAS AQUI COMO QUE SUCEDE SI NO ENCUENTRA UN USER COINCIDENTE
+	for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+		c = *it;
+		if (args[3] == c->getUsername())
+			break ;
+	}
+	// std::string userList = "";
+    // for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
+    //     if (!userList.empty())
+	// 		userList += " ";
+	// 	if (this->isOperator(*it2)) userList += "@"; // Añadir @ para operadores
+	// 	userList += (*it2)->getNickname();
+	// }
+	this->setOperator(c, true);
+	std::cout << "Nuevo usuario asignado como operador : " << c->getUsername() << std::endl;
+
 }
 
 
@@ -161,7 +188,7 @@ void    Channel::commandModeLimit(const std::vector<std::string>& args)
     if (args.size() < 4 || args[3].empty())
         return;
 
-    const char* s = args[2].c_str();
+    const char* s = args[3].c_str();
     char* end = NULL;
     errno = 0;
     long val = std::strtol(s, &end, 10);
