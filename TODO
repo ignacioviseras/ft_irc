@@ -13,8 +13,20 @@ COMANDOS
 	- Código de error 432 (Definir cuándo ocurre)
 
 - KICK
-	- A lo mejor no hay que enviar los nombres de todos los usuarios del canal cada vez que se une alguien? (Sin olvidar la lista de la derecha)
 	- Echar a un cliente desde fuera del canal no va?
+
+- JOIN
+	- Se puede unir a múltiples canales con el mismo comando?
+	- Si el comando es "/join 0", actúa como si el cliente se fuera de todos los canales a los que pertenece (PART).
+	- Enviar la respuesta 332 del channel topic si el comando es exitoso (ningún mensaje si no hay topic).
+	- Error 473 si el canal es invite only.
+	REVISAR CÓDIGOS DE ERROR
+
+- PART
+	- El meansaje hay que enviarlo al cliente o al canal? (Como se está haciendo ahora)
+
+- PRIVMSG
+	- Probarlo entre usuarios
 
 - NAMES = HexChat✅ Netcat ✅
 
@@ -22,8 +34,9 @@ COMANDOS
 	- i
 	- t
 	- k
-	- o* (Ver con los operadores) FALTA
-	- l FALTA
+	- o = HexChat✅
+	- l
+
 
 EXTRAS
 
