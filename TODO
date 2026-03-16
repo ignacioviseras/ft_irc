@@ -7,10 +7,16 @@ COMANDOS
 
 - PASS = HexChat✅ Netcat ✅
 - USER
-	- Pendiente parseo de argumentos 2 y 3
-	- Que no se pueda usar una vez registrado
+	Netcat ✅
+	- ✅⚠️Pendiente parseo de argumentos 2 y 3
+		esta añadido y funciona ⚠️(pero esta comentado)⚠️
+	- ✅Que no se pueda usar una vez registrado 
+		mensaje q retorna  ->  :irc.servidor.com 462  :You may not reregister
+
 - NICK
-	- Código de error 432 (Definir cuándo ocurre)
+	- ✅ Código de error 432 (Definir cuándo ocurre)
+		El error salta cuando pones @ ! espacios o empieza en numero se comprueba en isValidNickname
+			NICK asd@     ->  :irc.servidor.com 432 qwe asd@ :Erroneous nickname
 
 - KICK
 	- Echar a un cliente desde fuera del canal no va?
@@ -25,8 +31,13 @@ COMANDOS
 - PART
 	- El meansaje hay que enviarlo al cliente o al canal? (Como se está haciendo ahora)
 
+- INVITE ❓❓❓❓❓
+
 - PRIVMSG
 	- Probarlo entre usuarios
+		Netcat ✅
+		✅PRIVMSG zxc QWEQWEQWE -> :qwe!qwe@irc.servidor.com PRIVMSG zxc :QWEQWEQWE
+		✅PRIVMSG zxc "hola que tal" -> :qwe!qwe@irc.servidor.com PRIVMSG zxc :"hola que tal"
 
 - NAMES = HexChat✅ Netcat ✅
 

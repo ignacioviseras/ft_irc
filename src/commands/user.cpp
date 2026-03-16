@@ -5,10 +5,12 @@ void Server::_user(Client* sender, const std::vector<std::string>& args) {
 		if (args.size() < 5) {
 			std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " USER :Not enough parameters";
 			send_message(sender->getFd(), errorMsg);
-		} else {
-			std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " USER :Too many parameters";
-			send_message(sender->getFd(), errorMsg);
 		}
+		// casos como USER asd 0 * :"hola que tal" son validos en mi opinion
+		// else {
+		// 	std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " USER :Too many parameters";
+		// 	send_message(sender->getFd(), errorMsg);
+		// }
 		return;
 	}
 	std::string username = args[1];
