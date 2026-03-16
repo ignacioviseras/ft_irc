@@ -30,6 +30,40 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
         return;
     }
 
+	//MODE I
+
+	if (channel.getInviteMode())
+	{
+		//NO SE CUAL ES EL ERROR DE ESTO
+		std::string errorMsg = ":irc.servidor.com 443 " + user.getNickname() + " " + chanName + " :is already on channel";
+        send_message(fd, errorMsg);
+		return ;
+	}
+
+	// MODE L: enforce channel limit (limit < 0 means no limit)
+	{
+		int limit = channel.getChannelLimit();
+		size_t userCount = channel.getUsers().size();
+		if (limit >= 0 && userCount >= static_cast<size_t>(limit))
+		{
+			std::string errorMsg = ":irc.servidor.com 471 " + user.getNickname() + " " + chanName + " :Channel is full";
+			send_message(fd, errorMsg);
+			return;
+		}
+	}
+
+	//MODE K
+
+	if (!channel.getKey().empty() && args[3] != channel.getKey())
+	{
+		//NO SE CUAL ES EL ERROR DE ESTO
+		std::string errorMsg = ":irc.servidor.com 443 " + user.getNickname() + " " + chanName + " :is already on channel";
+        send_message(fd, errorMsg);
+		return ;
+	}
+
+	
+
     channel.addUser(&user);
 	user.channels_joined.insert(chanName);
     if (channel.getUsers().size() == 1) {
