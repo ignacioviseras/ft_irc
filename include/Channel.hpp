@@ -30,6 +30,14 @@ class Channel {
 	    Channel(const std::string& name);
 	    ~Channel();
 	
+		//gettersmmode
+
+		bool getInviteMode(void) const;
+		bool getTopicMode(void) const;
+		int getChannelLimit(void) const;
+		std::string getKey(void) const; // or: const std::string& getKey() const;
+
+
 	    void addUser(Client* client);
 	    void removeUser(Client* client);
 	    bool hasUser(Client* client) const;

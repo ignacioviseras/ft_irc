@@ -362,10 +362,20 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         //--------- TOPIC -----------
         case Token::TOPIC:
 		{
-                if (args.size() <= 2)
-                    c->commandTopic(&user);
-                else
-                    c->commandTopic(args);
+			//mirar si el usuario es operador
+			if (c->getTopicMode() == true && c->isOperator(&user))
+			{
+				if (args.size() <= 2)
+					c->commandTopic(&user);
+				else
+					c->commandTopic(args);
+			}
+			else
+			{
+				//HAY QUE VER QUE ERROR HAY AQUI
+				std::string errorMsg = ":irc.servidor.com 443 " + user.getNickname() + " " + c->getName() + " :is already on channel";
+				send_message(fd, errorMsg);
+			}
             break;
         }
         //--------- MODE -----------

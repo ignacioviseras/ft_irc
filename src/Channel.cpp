@@ -48,6 +48,26 @@ const std::set<Client*>& Channel::getUsers() const {
     return _users;
 }
 
+//mode getters
+
+bool Channel::getInviteMode() const {
+    return _inviteOnly;
+}
+
+bool Channel::getTopicMode() const {
+    return _topicRestricted;
+}
+
+int Channel::getChannelLimit() const {
+	return _channelLimit;
+}
+
+std::string Channel::getKey() const {
+	return _key;
+}
+
+
+
 void Channel::sendToChannel(const std::string& message, Client* exclude) {
     const std::set<Client*>& users = this->getUsers();
     for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
@@ -70,6 +90,7 @@ void	Channel::commandTopic(const std::vector<std::string>& args){
     }
     if (!top.empty() && top[0] == ':')
         top.erase(0, 1);
+	
     setTopic(top);
 }
 
@@ -79,15 +100,6 @@ void	Channel::commandTopic(Client *client){
     // std::string full = toPrint + "\r\n";
 	sendToChannel(toPrint, 0);
 }
-
-// void	Channel::commandKick(Client *client){
-//     Channel::removeUser(client);
-// }
-
-// void	Channel::commandInvite(Client *client){
-//     Channel::addUser(client);
-// }
-
 
 
 void   Channel::commandMode(const std::vector<std::string>& args){
