@@ -15,27 +15,24 @@ COMANDOS
 - KICK = HexChat(Echar a un cliente desde fuera del canal no va?) Netcat ✅
 
 - JOIN
-	- Unir a múltiples canales en el mismo comando.
-	- Si el comando es "/join 0", actúa como si el cliente se fuera de todos los canales a los que pertenece (PART).
-	- Enviar la respuesta 332 del channel topic si el comando es exitoso (ningún mensaje si no hay topic).
-	- Error 473 si el canal es invite only.
-	REVISAR CÓDIGOS DE ERROR
+	- Revisar códigos de error de los modos.
 
 - PART
-	- El meansaje hay que enviarlo al cliente o al canal? (Como se está haciendo ahora)
+	- El mensaje hay que enviarlo al cliente o al canal? (Como se está haciendo ahora)
 
 - INVITE ❓❓❓❓❓
+- TOPIC
+	- Comprobar cómo imprime la información. Hay que enviarlo al sender. Revisarlo con params.
 
 - PRIVMSG = HexChat✅ Netcat ✅
-
 - NAMES = HexChat✅ Netcat ✅
 
 - Mode:
-	- i
-	- t
-	- k
+	- i = HexChat✅
+	- t = HexChat✅
+	- k = HexChat✅
 	- o = HexChat✅
-	- l
+	- l = HexChat✅
 
 
 EXTRAS
