@@ -51,6 +51,8 @@ class Channel {
 
 		//COMMANDS
 
+		void	commandList(void);
+
 		void	commandHub(Token tok, Client *client);
 		// void	commandKick(Client* sender, const std::vector<std::string>& args);
 		void	commandInvite(Client* sender, const std::vector<std::string>& args);

@@ -101,6 +101,20 @@ void	Channel::commandTopic(Client *client){
 	sendToChannel(toPrint, 0);
 }
 
+void	Channel::commandList(void){
+	const std::set<Client*> list = this->getUsers();
+	    for (std::set<Client*>::const_iterator it = list.begin(); it != list.end(); ++it) {
+        Client* c = *it;
+        if (!c)
+			continue;
+        std::string name = c->getNickname().empty() ? c->getUsername() : c->getNickname();
+        if (this->isOperator(c))
+            std::cout << "@" << name << std::endl;
+        else
+            std::cout << name << std::endl;
+    }
+}
+
 
 void   Channel::commandMode(const std::vector<std::string>& args){
 
