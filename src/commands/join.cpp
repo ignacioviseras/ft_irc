@@ -86,14 +86,8 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
 		userList += (*it2)->getNickname();
 	}
 
-	//sendChannelNames(&channel, serverName);
 	for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
         Client* c = *it2;
-        std::string namesReply = ":" + serverName + " 353 " + c->getNickname() + " = " + chanName + " :" + userList;
-        std::cout << "Sending NAMES to " << c->getNickname() << ": " << namesReply << std::endl;
-        send_message(c->getFd(), namesReply);
-        std::string endNames = ":" + serverName + " 366 " + c->getNickname() + " " + chanName + " :End of /NAMES list.";
-        std::cout << "Sending: " << endNames << std::endl;
-        send_message(c->getFd(), endNames);
+        Server::sendNames(c->getFd(), serverName, c->getNickname(), chanName, userList);
     }
 }

@@ -177,6 +177,8 @@ void Server::handleClientData(int fd) {
         if (!commandLine.empty() && commandLine[commandLine.length() - 1] == '\r')// irc usa \r\n quitamos los \r
             commandLine.erase(commandLine.length() - 1);
 
+        commandLine = sanitizeIrcLine(commandLine); // quitamos BOM y espacios/tabs al principio
+
         if (!commandLine.empty()) {
             std::cout << "fd: " << fd << ": " << commandLine << std::endl;
             handleCommand(fd, commandLine);
@@ -190,12 +192,20 @@ bool Server::parse(const std::string& commandLine, std::vector<std::string>& arg
     if (!parse_commands(commandLine))
         return false;
     std::vector<std::string> rawArgs = split(commandLine, " ");
-    for (size_t i = 0; i < rawArgs.size(); ++i) {
-        if (!rawArgs[i].empty())
-            args.push_back(rawArgs[i]);
-    }
-    if (args.empty())
+    if (rawArgs.empty())
         return false;
+
+    std::string commandToken = sanitizeCommandToken(rawArgs[0]); // Sanitize command token 
+    if (commandToken.empty())
+        return false;
+    args.push_back(commandToken);
+
+    for (size_t i = 1; i < rawArgs.size(); ++i) {
+        std::string cleanedToken = sanitizeIrcToken(rawArgs[i]); // Sanitize parameter tokens
+
+        if (!cleanedToken.empty())
+            args.push_back(cleanedToken);
+    }
 
     return true;
 }

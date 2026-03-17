@@ -44,19 +44,9 @@ void Server::_quit(Client* sender, const std::vector<std::string>& args) {
             }
 			std::string serverName = "irc.servidor.com";
 
-			//sendChannelNames(&uIt->second, serverName);
 			for (std::set<Client*>::const_iterator uIt = remainingUsers.begin(); uIt != remainingUsers.end(); ++uIt) {
     		    Client* target = *uIt;
-
-				send_message(target->getFd(), quitMsg); // Enviar mensaje de QUIT a cada usuario restante
-
-    		    std::string namesReply = ":" + serverName + " 353 " + target->getNickname() + " = " + chanName + " :" + userList;
-    		    std::cout << "Sending NAMES to " << target->getNickname() << ": " << namesReply << std::endl;
-    		    send_message(target->getFd(), namesReply);
-
-    		    std::string endNames = ":" + serverName + " 366 " + target->getNickname() + " " + chanName + " :End of /NAMES list.";
-    		    std::cout << "Sending: " << endNames << std::endl;
-    		    send_message(target->getFd(), endNames);
+				Server::sendNames(target->getFd(), serverName, target->getNickname(), chanName, userList);
     		}
 		}
 	}

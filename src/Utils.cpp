@@ -5,6 +5,22 @@ static bool isPrintableAscii(unsigned char ch) {
     return ch >= 33 && ch <= 126;
 }
 
+static bool isLeadingCommandByte(unsigned char ch) {
+    return std::isalpha(ch) || ch == ':';
+}
+
+static std::string keepAlphabeticUppercase(const std::string& rawToken) {
+    std::string cleaned;
+
+    for (std::string::const_iterator it = rawToken.begin(); it != rawToken.end(); ++it) {
+        unsigned char ch = static_cast<unsigned char>(*it);
+
+        if (std::isalpha(ch))
+            cleaned += static_cast<char>(std::toupper(ch));
+    }
+    return cleaned;
+}
+
 //split guarro joseado para salir del paso
 std::vector<std::string> split(const std::string& s, const std::string& delimiter) {
     std::vector<std::string> Tokens;
@@ -85,6 +101,61 @@ Token::type Token_assign_type(const std::string& arg)
         return (Token::UNKNOWN);
 }
 
+// UTF-8 BOM + leading spaces/tabs control
+std::string sanitizeIrcLine(const std::string& rawLine)
+{
+    size_t start = 0;
+
+    if (rawLine.compare(0, 3, "\xEF\xBB\xBF") == 0)
+        start = 3;
+    while (start < rawLine.size()) {
+        unsigned char ch = static_cast<unsigned char>(rawLine[start]);
+
+        if (isLeadingCommandByte(ch))
+            break;
+        if (ch == ' ' || ch == '\t' || ch < 33 || ch > 126) {
+            ++start;
+            continue;
+        }
+        break;
+    }
+    return rawLine.substr(start);
+}
+
+// Quita caracteres no imprimibles y espacios/tabs del principio y final de cada token
+std::string sanitizeIrcToken(const std::string& rawToken)
+{
+    std::string cleaned;
+
+    for (std::string::const_iterator it = rawToken.begin(); it != rawToken.end(); ++it) {
+        unsigned char ch = static_cast<unsigned char>(*it);
+
+        if (ch >= 33 && ch <= 126)
+            cleaned += static_cast<char>(ch);
+    }
+    return cleaned;
+}
+
+// Recupera posiblemente un comando válido de un token, 
+// quitando caracteres no imprimibles, espacios/tabs, 
+// y buscando subcadenas que sean comandos válidos
+std::string sanitizeCommandToken(const std::string& rawToken)
+{
+    std::string cleaned = keepAlphabeticUppercase(rawToken);
+
+    if (cleaned.empty())
+        return cleaned;
+    if (Token_assign_type(cleaned) != Token::UNKNOWN)
+        return cleaned;
+    for (size_t i = 1; i < cleaned.size(); ++i) {
+        std::string candidate = cleaned.substr(i);
+
+        if (Token_assign_type(candidate) != Token::UNKNOWN)
+            return candidate;
+    }
+    return cleaned;
+}
+
 std::string normalizeChannelName(const std::string& rawName)
 {
     std::string cleaned;
@@ -101,8 +172,8 @@ std::string normalizeChannelName(const std::string& rawName)
 
     if (cleaned.empty())
         return cleaned;
-    if (cleaned[0] != '#')
-        cleaned.insert(cleaned.begin(), '#');
+    /* if (cleaned[0] != '#')
+        cleaned.insert(cleaned.begin(), '#'); */
     return cleaned;
 }
 
@@ -117,20 +188,4 @@ bool isValidChannelName(const std::string& channelName)
             return false;
     }
     return true;
-}
-
-// Enviar NAMES a todos los usuarios del canal para mostrar la lista actualizada
-void Server::sendChannelNames(Channel* channel, const std::string& serverName) {
-	const std::string& chanName = channel->getName();
-	std::string userList;
-	const std::set<Client*>& users = channel->getUsers();
-	for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
-        Client* c = *it2;
-        std::string namesReply = ":" + serverName + " 353 " + c->getNickname() + " = " + chanName + " :" + userList;
-        std::cout << "Sending NAMES to " << c->getNickname() << ": " << namesReply << std::endl;
-        send_message(c->getFd(), namesReply);
-        std::string endNames = ":" + serverName + " 366 " + c->getNickname() + " " + chanName + " :End of /NAMES list.";
-        std::cout << "Sending: " << endNames << std::endl;
-        send_message(c->getFd(), endNames);
-    }
 }

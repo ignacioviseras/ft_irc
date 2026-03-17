@@ -10,16 +10,13 @@ COMANDOS
 	Netcat ✅
 	- ✅⚠️Pendiente parseo de argumentos 2 y 3
 		esta añadido y funciona ⚠️(pero esta comentado)⚠️
-	- ✅Que no se pueda usar una vez registrado 
-		mensaje q retorna  ->  :irc.servidor.com 462  :You may not reregister
 
 - NICK
 	- ✅ Código de error 432 (Definir cuándo ocurre)
 		El error salta cuando pones @ ! espacios o empieza en numero se comprueba en isValidNickname
 			NICK asd@     ->  :irc.servidor.com 432 qwe asd@ :Erroneous nickname
 
-- KICK
-	- Echar a un cliente desde fuera del canal no va?
+- KICK = HexChat(Echar a un cliente desde fuera del canal no va?) Netcat ✅
 
 - JOIN
 	- Se puede unir a múltiples canales con el mismo comando?
@@ -33,11 +30,7 @@ COMANDOS
 
 - INVITE ❓❓❓❓❓
 
-- PRIVMSG
-	- Probarlo entre usuarios
-		Netcat ✅
-		✅PRIVMSG zxc QWEQWEQWE -> :qwe!qwe@irc.servidor.com PRIVMSG zxc :QWEQWEQWE
-		✅PRIVMSG zxc "hola que tal" -> :qwe!qwe@irc.servidor.com PRIVMSG zxc :"hola que tal"
+- PRIVMSG = HexChat✅ Netcat ✅
 
 - NAMES = HexChat✅ Netcat ✅
 

@@ -46,6 +46,7 @@ class Server
 		void _privMsg(Client* sender, const std::vector<std::string>& args);
 		void _kick(Client* sender, const std::vector<std::string>& args);
         void _names(int fd, const std::vector<std::string>& args);
+        void sendNames(int fd, std::string serverName, std::string nickname, std::string chanName, std::string userList);
 
 		void _user(Client* sender, const std::vector<std::string>& args);
 		void _quit(Client* sender, const std::vector<std::string>& args);
@@ -54,7 +55,6 @@ class Server
 		void _nick(int fd, const std::vector<std::string>& args);
 
 		void sendToChannel(const Channel& channel, const std::string& msg);
-		void sendChannelNames(Channel* channel, const std::string& serverName);
 
 		Client* findClientByNick(const std::string& nick);
 		void disconnectClient(int fd);

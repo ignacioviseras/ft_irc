@@ -1,5 +1,15 @@
 #include "../../include/Server.hpp"
 
+void Server::sendNames(int fd, std::string serverName, std::string nickname, std::string chanName, std::string userList) {
+	// Send NAMES reply
+	std::string namesReply = ":" + serverName + " 353 " + nickname + " = " + chanName + " :" + userList;
+	send_message(fd, namesReply);
+
+	// Send end of NAMES
+	std::string endNames = ":" + serverName + " 366 " + nickname + " " + chanName + " :End of /NAMES list.";
+	send_message(fd, endNames);
+}
+
 void Server::_names(int fd, const std::vector<std::string>& args) {
 	Client& user = _clients[fd];
 	std::string serverName = "irc.servidor.com";
@@ -37,11 +47,5 @@ void Server::_names(int fd, const std::vector<std::string>& args) {
 		userList += (*it)->getNickname();
 	}
 
-	// Send NAMES reply
-	std::string namesReply = ":" + serverName + " 353 " + user.getNickname() + " = " + chanName + " :" + userList;
-	send_message(fd, namesReply);
-
-	// Send end of NAMES
-	std::string endNames = ":" + serverName + " 366 " + user.getNickname() + " " + chanName + " :End of /NAMES list.";
-	send_message(fd, endNames);
+	sendNames(fd, serverName, user.getNickname(), chanName, userList);
 }
