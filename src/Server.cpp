@@ -405,6 +405,10 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             std::cout << "Ejecutando lógica de PRIVMSG..." << std::endl;
 			_privMsg(&user, args);
             break;
+		case Token::LIST:
+            std::cout << "Ejecutando lógica de LIST..." << std::endl;
+			commandList(fd);
+            break;
         case Token::UNKNOWN:
 			//sea lo que sea la gestion que hay que hacer aqui.
 			break;
@@ -453,4 +457,30 @@ void Server::disconnectClient(int fd) {
     epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL);
     close(fd);
     _clients.erase(fd);
+}
+
+
+void Server::commandList(int fd)
+{
+    if (_clients.find(fd) == _clients.end())
+        return;
+
+    const Client &user = _clients[fd];
+
+    for (std::map<std::string, Channel>::const_iterator it = _channels.begin(); it != _channels.end(); ++it) {
+        const std::string &chanName = it->first;
+        const Channel &ch = it->second;
+
+        std::string topic = ch.getTopic();
+        if (topic.empty() || topic == "There is no topic in the channel.")
+            topic = "(no topic)";
+
+        // simple listing line; use numeric 322 (RPL_LIST) style
+        std::string line = ":irc.servidor.com 322 " + user.getNickname() + " " + chanName + " :" + topic;
+        send_message(fd, line);
+    }
+
+    // end of list (numeric 323)
+    std::string endLine = ":irc.servidor.com 323 " + user.getNickname() + " :End of /LIST";
+    send_message(fd, endLine);
 }

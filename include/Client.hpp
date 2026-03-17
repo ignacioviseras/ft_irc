@@ -24,7 +24,7 @@ public:
     void setHostname(const std::string &hostname);
     void setServername(const std::string &servername);
     void setRealname(const std::string &realname);
-    std::string &getNickname();
+    std::string getNickname() const;
     std::string &getUsername();
     
 private:

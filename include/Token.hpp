@@ -24,8 +24,8 @@ class Token
             MODE,
             NAMES,
             PRIVMSG, // para mensajes
-            UNKNOWN //se puede usar por si no existe y asi se tramita
-
+            UNKNOWN, //se puede usar por si no existe y asi se tramita
+			LIST
         };
 
         Token();

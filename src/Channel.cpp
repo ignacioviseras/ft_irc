@@ -34,7 +34,7 @@ void    Channel::setTopic(std::string top){
     _topic = top;
 }
 
-std::string Channel::getTopic(){
+std::string Channel::getTopic() const {
     if (_topic.empty())
         return "There is no topic in the channel.";
     return _topic;
@@ -100,21 +100,6 @@ void	Channel::commandTopic(Client *client){
     // std::string full = toPrint + "\r\n";
 	sendToChannel(toPrint, 0);
 }
-
-void	Channel::commandList(void){
-	const std::set<Client*> list = this->getUsers();
-	    for (std::set<Client*>::const_iterator it = list.begin(); it != list.end(); ++it) {
-        Client* c = *it;
-        if (!c)
-			continue;
-        std::string name = c->getNickname().empty() ? c->getUsername() : c->getNickname();
-        if (this->isOperator(c))
-            std::cout << "@" << name << std::endl;
-        else
-            std::cout << name << std::endl;
-    }
-}
-
 
 void   Channel::commandMode(const std::vector<std::string>& args){
 

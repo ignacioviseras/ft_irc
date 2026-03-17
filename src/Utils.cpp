@@ -97,6 +97,8 @@ Token::type Token_assign_type(const std::string& arg)
         return (Token::NAMES);
 	else if (arg == "QUIT")
 		return (Token::QUIT);
+	else if (arg == "LIST")
+		return (Token::LIST);
     else
         return (Token::UNKNOWN);
 }

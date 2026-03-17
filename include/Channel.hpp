@@ -15,20 +15,9 @@
 
 
 class Channel {
-	private:
-	    std::string _name;
-	    std::set<Client*> _users;
-	    std::set<Client*> _operators;
-		std::string _topic;
-		std::string _key;
-		bool	_inviteOnly;
-		bool	_topicRestricted;
-		int		_channelLimit;
-
-
-	public:
-	    Channel(const std::string& name);
-	    ~Channel();
+public:
+    Channel(const std::string& name);
+    ~Channel();
 	
 		//gettersmmode
 
@@ -43,15 +32,13 @@ class Channel {
 	    bool hasUser(Client* client) const;
 	    bool isOperator(Client* client) const;
 		void setTopic(std::string top);
-		std::string getTopic();
+		std::string getTopic() const;
 	    void setOperator(Client* client, bool op);
 	    const std::string& getName() const;
 	    const std::set<Client*>& getUsers() const;
 		void sendToChannel(const std::string& message, Client* exclude);
 
 		//COMMANDS
-
-		void	commandList(void);
 
 		void	commandHub(Token tok, Client *client);
 		// void	commandKick(Client* sender, const std::vector<std::string>& args);
@@ -68,6 +55,17 @@ class Channel {
 
 		void 	sendMessage(Client* sender, const std::string& message);
 
-	};
+	private:
+	    std::string _name;
+	    std::set<Client*> _users;
+	    std::set<Client*> _operators;
+		std::string _topic;
+		std::string _key;
+		bool	_inviteOnly;
+		bool	_topicRestricted;
+		int		_channelLimit;
+
+
+};
 
 #endif

@@ -42,26 +42,28 @@ class Server
         void send_message(int fd, std::string message);
         void checkRegistration(int fd, Client &user);
 
+		
 		void _join(int fd, const std::vector<std::string>& args);
 		void _privMsg(Client* sender, const std::vector<std::string>& args);
 		void _kick(Client* sender, const std::vector<std::string>& args);
         void _names(int fd, const std::vector<std::string>& args);
         void sendNames(int fd, std::string serverName, std::string nickname, std::string chanName, std::string userList);
-
+		
 		void _user(Client* sender, const std::vector<std::string>& args);
 		void _quit(Client* sender, const std::vector<std::string>& args);
 		void _pass(Client* sender, const std::vector<std::string>& args);
 		void _part(Client* sender, const std::vector<std::string>& args);
 		void _nick(int fd, const std::vector<std::string>& args);
-
+		
 		void sendToChannel(const Channel& channel, const std::string& msg);
-
+		
 		Client* findClientByNick(const std::string& nick);
 		void disconnectClient(int fd);
-
+		
 		//mixi
-
+		
 		Channel* findServer(const std::vector<std::string>& args);
+		void	commandList(int fd);
 
 
 	public:
