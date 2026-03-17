@@ -1,25 +1,21 @@
-# Vamos a escribir todo lo que tenemos pendiente.
-# Propongo que todo lo que esté hecho lo comprobemos con HexChat (cliente de referencia) y nc,
-# poner un ✅ cada vez que verifiquemos que algo funcione. 
+# ########################################################################### #
+# Vamos a escribir todo lo que tenemos pendiente.                             #              
+#                                                                             #      
+# Propongo que todo lo que esté hecho lo comprobemos con HexChat (cliente de  #
+# referencia) y nc, poner un ✅ cada vez que verifiquemos que algo funcione. #
+# #############################################################################
 
 
 COMANDOS
 
-- PASS = HexChat✅ Netcat ✅
-- USER
-	Netcat ✅
-	- ✅⚠️Pendiente parseo de argumentos 2 y 3
-		esta añadido y funciona ⚠️(pero esta comentado)⚠️
-
-- NICK
-	- ✅ Código de error 432 (Definir cuándo ocurre)
-		El error salta cuando pones @ ! espacios o empieza en numero se comprueba en isValidNickname
-			NICK asd@     ->  :irc.servidor.com 432 qwe asd@ :Erroneous nickname
+- PASS = HexChat✅ Netcat✅
+- USER = HexChat✅ Netcat✅
+- NICK = HexChat✅ Netcat✅
 
 - KICK = HexChat(Echar a un cliente desde fuera del canal no va?) Netcat ✅
 
 - JOIN
-	- Se puede unir a múltiples canales con el mismo comando?
+	- Unir a múltiples canales en el mismo comando.
 	- Si el comando es "/join 0", actúa como si el cliente se fuera de todos los canales a los que pertenece (PART).
 	- Enviar la respuesta 332 del channel topic si el comando es exitoso (ningún mensaje si no hay topic).
 	- Error 473 si el canal es invite only.
