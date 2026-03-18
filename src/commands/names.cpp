@@ -20,32 +20,26 @@ void Server::_names(int fd, const std::vector<std::string>& args) {
 		return;
 	}
 
-	// TODO: Esto no está repetido?
-	std::string chanName = normalizeChannelName(args[1]);
-	if (!isValidChannelName(chanName)) {
-		std::string endNames = ":" + serverName + " 366 " + user.getNickname() + " " + args[1] + " :End of /NAMES list.";
-		send_message(fd, endNames);
-		return;
-	}
+	std::vector<std::string> rawChannels = split(args[1], ",");
+	for (size_t i = 0; i < rawChannels.size(); ++i) {
+		std::string chanName = normalizeChannelName(rawChannels[i]);
+		std::map<std::string, Channel>::iterator it = _channels.find(chanName);
+		if (it == _channels.end()) {
+			std::string errorMsg = ":irc.servidor.com 403 " + user.getNickname() + " " + chanName + " :No such channel";
+			send_message(fd, errorMsg);
+			continue;
+		}
+		Channel& channel = it->second;
 
-	// Check if channel exists
-	if (_channels.find(chanName) == _channels.end()) {
-		std::string endNames = ":" + serverName + " 366 " + user.getNickname() + " " + chanName + " :End of /NAMES list.";
-		send_message(fd, endNames);
-		return;
-	}
-
-	Channel& channel = _channels.find(chanName)->second;
-
-	// Build user list with operator prefixes
-	std::string userList = "";
-	const std::set<Client*>& users = channel.getUsers();
-	for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
-		if (!userList.empty())
-			userList += " ";
-		if (channel.isOperator(*it)) userList += "@"; // Add @ for operators
-		userList += (*it)->getNickname();
-	}
-
-	sendNames(fd, serverName, user.getNickname(), chanName, userList);
+		// Build user list with operator prefixes
+		std::string userList = "";
+		const std::set<Client*>& users = channel.getUsers();
+		for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+			if (!userList.empty())
+				userList += " ";
+			if (channel.isOperator(*it)) userList += "@"; // Add @ for operators
+			userList += (*it)->getNickname();
+		}
+		sendNames(fd, serverName, user.getNickname(), chanName, userList);
+		}
 }
