@@ -48,7 +48,8 @@ class Server
 		void _kick(Client* sender, const std::vector<std::string>& args);
         void _names(int fd, const std::vector<std::string>& args);
         void sendNames(int fd, std::string serverName, std::string nickname, std::string chanName, std::string userList);
-		
+		void _invite(Client* sender, const std::vector<std::string>& args);
+
 		void _user(Client* sender, const std::vector<std::string>& args);
 		void _quit(Client* sender, const std::vector<std::string>& args);
 		void _pass(Client* sender, const std::vector<std::string>& args);
@@ -64,6 +65,7 @@ class Server
 		
 		Channel* findServer(const std::vector<std::string>& args);
 		void	commandList(int fd);
+		void	commandInvite(Client* sender, const std::vector<std::string>& args);
 
 
 	public:

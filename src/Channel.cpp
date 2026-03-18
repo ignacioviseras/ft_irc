@@ -9,6 +9,11 @@ void Channel::addUser(Client* client) {
     _users.insert(client);
 }
 
+
+void Channel::addInvited(Client* client) {
+    _invited.insert(client);
+}
+
 void Channel::removeUser(Client* client) {
     _users.erase(client);
     _operators.erase(client);
@@ -46,6 +51,11 @@ const std::string& Channel::getName() const {
 
 const std::set<Client*>& Channel::getUsers() const {
     return _users;
+}
+
+
+const std::set<Client*>& Channel::getInvited() const {
+    return _invited;
 }
 
 //mode getters
@@ -111,11 +121,8 @@ void   Channel::commandMode(const std::vector<std::string>& args){
     std::cout << std::endl;
     if (args.size() <= 2 || args[2].empty())
 	{
-		std::cout << "los primos nos fuiimos" << std::endl;
 		return;
-
 	}
-	std::cout << "Flag?? :: " << args[2] << std::endl;
     char flag = args[2].at(0);
     switch (flag) {
         case 'i':
@@ -192,7 +199,6 @@ void    Channel::commandModeOperator(const std::vector<std::string>& args)
 	std::cout << "Nuevo usuario asignado como operador : " << c->getUsername() << std::endl;
 
 }
-
 
 void    Channel::commandModeLimit(const std::vector<std::string>& args)
 {

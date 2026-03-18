@@ -250,7 +250,6 @@ void Server::handleClientWrite(int fd) {
         return;
     }
     
-
     // quitamos EPOLLOUT solo cuando el buffer este vacio
     if (buffer.empty()) {
         struct epoll_event ev;
@@ -286,8 +285,6 @@ void Server::checkRegistration(int fd, Client &user) {
         }
     }
 }
-
-//mixi
 
 Channel* Server::findServer(const std::vector<std::string>& args)
 {
@@ -367,7 +364,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 		}
         //--------- INVITE -----------
         case Token::INVITE:
-            //c->commandInvite(&user, args);
+            _invite(&user, args);
             break;
         //--------- TOPIC -----------
         case Token::TOPIC:
@@ -458,7 +455,6 @@ void Server::disconnectClient(int fd) {
     close(fd);
     _clients.erase(fd);
 }
-
 
 void Server::commandList(int fd)
 {

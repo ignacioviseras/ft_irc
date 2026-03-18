@@ -26,7 +26,7 @@ public:
 		int getChannelLimit(void) const;
 		std::string getKey(void) const; // or: const std::string& getKey() const;
 
-
+		void addInvited(Client* client);
 	    void addUser(Client* client);
 	    void removeUser(Client* client);
 	    bool hasUser(Client* client) const;
@@ -35,14 +35,14 @@ public:
 		std::string getTopic() const;
 	    void setOperator(Client* client, bool op);
 	    const std::string& getName() const;
-	    const std::set<Client*>& getUsers() const;
+	    const std::set<Client*>& getInvited() const;
+		const std::set<Client*>& getUsers() const;
+
 		void sendToChannel(const std::string& message, Client* exclude);
 
 		//COMMANDS
 
 		void	commandHub(Token tok, Client *client);
-		// void	commandKick(Client* sender, const std::vector<std::string>& args);
-		void	commandInvite(Client* sender, const std::vector<std::string>& args);
 		void	commandTopic(const std::vector<std::string>& args);
 		void	commandTopic(Client *client);
 		void    commandMode(const std::vector<std::string>& args);
@@ -59,6 +59,8 @@ public:
 	    std::string _name;
 	    std::set<Client*> _users;
 	    std::set<Client*> _operators;
+		std::set<Client*> _invited;
+
 		std::string _topic;
 		std::string _key;
 		bool	_inviteOnly;
