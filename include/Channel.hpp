@@ -45,14 +45,6 @@ public:
 		void	commandHub(Token tok, Client *client);
 		void	commandTopic(const std::vector<std::string>& args);
 		void	commandTopic(Client *client);
-		void    commandMode(const std::vector<std::string>& args);
-
-		void    commandModeInvite();
-		void    commandModeKey(const std::vector<std::string>& args);
-		void    commandModeOperator(const std::vector<std::string>& args);
-		void    commandModeTopic();
-		void    commandModeLimit(const std::vector<std::string>& args);
-
 		void 	sendMessage(Client* sender, const std::string& message);
 
 	private:

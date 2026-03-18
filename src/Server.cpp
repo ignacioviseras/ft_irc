@@ -386,9 +386,9 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             break;
         }
         //--------- MODE -----------
-        case Token::MODE:
-        	c->commandMode(args);
-            break;
+        // case Token::MODE:
+        // 	c->commandMode(args);
+        //     break;
 		case Token::QUIT: {
             _quit(&user, args);
 			break;
@@ -463,6 +463,8 @@ void Server::commandList(int fd)
 
     const Client &user = _clients[fd];
 
+    std::string firstLine = ":irc.servidor.com 321 " + user.getNickname() + "Channel :Users Name";
+    send_message(fd, firstLine);
     for (std::map<std::string, Channel>::const_iterator it = _channels.begin(); it != _channels.end(); ++it) {
         const std::string &chanName = it->first;
         const Channel &ch = it->second;

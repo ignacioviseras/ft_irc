@@ -48,7 +48,14 @@ class Server
 		void _kick(Client* sender, const std::vector<std::string>& args);
         void _names(int fd, const std::vector<std::string>& args);
         void sendNames(int fd, std::string serverName, std::string nickname, std::string chanName, std::string userList);
+		
 		void _invite(Client* sender, const std::vector<std::string>& args);
+		void _mode(const std::vector<std::string>& args);
+		void _modeInvite();
+		void _modeKey(const std::vector<std::string>& args);
+		void _modeOperator(const std::vector<std::string>& args);
+		void _modeLimit(const std::vector<std::string>& args);
+		void _modeTopic();
 
 		void _user(Client* sender, const std::vector<std::string>& args);
 		void _quit(Client* sender, const std::vector<std::string>& args);
