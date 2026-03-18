@@ -34,7 +34,7 @@ nc localhost 5555
 | INVITE \<usuario> \<canal> | Invita a un usuario a un canal (necesario si el canal es `+i`). |
 | TOPIC \<canal> [:\<topic>] | Consulta o cambia el tema de conversación del canal. |
 | KICK \<canal> \<usuario> [:\<razón>] | Consulta o cambia el tema de conversación del canal. |
-| PART \<canal> [:\<mensaje>] | Sales de un canal específico, opcionalmente con un mensaje de despedida. |
+| PART \<canal>[,\<canal>] [:\<mensaje>] | Sales de un canal específico, opcionalmente con un mensaje de despedida. |
 | MODE \<canal/user> \<modos> [args] | Cambia permisos o estados. |
 | NAMES [\<canal>] | Lista los apodos de todos los usuarios conectados en un canal |
 | QUIT [:\<mensaje>] | Cierra tu conexión con el servidor definitivamente. |

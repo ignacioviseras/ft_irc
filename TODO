@@ -11,28 +11,28 @@ COMANDOS
 - PASS = HexChat✅ Netcat✅
 - USER = HexChat✅ Netcat✅
 - NICK = HexChat✅ Netcat✅
-
-- KICK = HexChat(Echar a un cliente desde fuera del canal no va?) Netcat ✅
-
+- PRIVMSG = HexChat✅ Netcat ✅
 - JOIN
 	- Revisar códigos de error de los modos.
-
-- PART
-	- El mensaje hay que enviarlo al cliente o al canal? (Como se está haciendo ahora)
-
-- INVITE ❓❓❓❓❓
+- INVITE = ❌
 - TOPIC
 	- Comprobar cómo imprime la información. Hay que enviarlo al sender. Revisarlo con params.
-
-- PRIVMSG = HexChat✅ Netcat ✅
-- NAMES = HexChat✅ Netcat ✅
-
-- Mode:
+- KICK = HexChat(Echar a un cliente desde fuera del canal no va?) Netcat ✅
+- PART = [:\<mensaje>]
+- MODE:
 	- i = HexChat✅
 	- t = HexChat✅
 	- k = HexChat✅
 	- o = HexChat✅
 	- l = HexChat✅
+- NAMES = HexChat✅ Netcat ✅
+- QUIT = [:\<mensaje>]
+
+
+
+
+
+
 
 
 EXTRAS
