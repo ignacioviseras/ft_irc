@@ -286,7 +286,7 @@ void Server::checkRegistration(int fd, Client &user) {
     }
 }
 
-Channel* Server::findServer(const std::vector<std::string>& args)
+Channel* Server::findChannel(const std::vector<std::string>& args)
 {
     if (args.size() < 2) {
 		return NULL;
@@ -330,7 +330,6 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         send_message(fd, ":irc.servidor.com 451 * :You have not registered NICK y USER.");
         return;
     }
-	Channel *c = findServer(args);
     switch (cmdType) {
         //--------- USER -----------
         case Token::USER:{
@@ -369,20 +368,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         //--------- TOPIC -----------
         case Token::TOPIC:
 		{
-			//mirar si el usuario es operador
-			if (c->getTopicMode() == true && c->isOperator(&user))
-			{
-				if (args.size() <= 2)
-					c->commandTopic(&user);
-				else
-					c->commandTopic(args);
-			}
-			else
-			{
-				//HAY QUE VER QUE ERROR HAY AQUI
-				std::string errorMsg = ":irc.servidor.com 443 " + user.getNickname() + " " + c->getName() + " :is already on channel";
-				send_message(fd, errorMsg);
-			}
+            _topic(fd, args);
             break;
         }
         //--------- MODE -----------

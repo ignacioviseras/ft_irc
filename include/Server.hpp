@@ -49,6 +49,7 @@ class Server
         void _names(int fd, const std::vector<std::string>& args);
         void sendNames(int fd, std::string serverName, std::string nickname, std::string chanName, std::string userList);
 		
+		void _topic(int fd, const std::vector<std::string>& args);
 		void _invite(Client* sender, const std::vector<std::string>& args);
 		void _mode(const std::vector<std::string>& args);
 		void _modeInvite();
@@ -70,7 +71,7 @@ class Server
 		
 		//mixi
 		
-		Channel* findServer(const std::vector<std::string>& args);
+		Channel* findChannel(const std::vector<std::string>& args);
 		void	commandList(int fd);
 		void	commandInvite(Client* sender, const std::vector<std::string>& args);
 

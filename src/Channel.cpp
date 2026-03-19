@@ -76,8 +76,6 @@ std::string Channel::getKey() const {
 	return _key;
 }
 
-
-
 void Channel::sendToChannel(const std::string& message, Client* exclude) {
     const std::set<Client*>& users = this->getUsers();
     for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
@@ -88,27 +86,3 @@ void Channel::sendToChannel(const std::string& message, Client* exclude) {
         send(c->getFd(), full.c_str(), full.length(), 0);
     }
 }
-
-void	Channel::commandTopic(const std::vector<std::string>& args){
-
-	std::string top;
-
-    for (size_t i = 2; i < args.size(); ++i) {
-        if (i > 2)
-            top += " ";
-        top += args[i];
-    }
-    if (!top.empty() && top[0] == ':')
-        top.erase(0, 1);
-	
-    setTopic(top);
-}
-
-void	Channel::commandTopic(Client *client){
-	(void)client;
-    std::string toPrint = Channel::getTopic();
-    // std::string full = toPrint + "\r\n";
-	sendToChannel(toPrint, 0);
-}
-
-

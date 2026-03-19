@@ -43,8 +43,6 @@ public:
 		//COMMANDS
 
 		void	commandHub(Token tok, Client *client);
-		void	commandTopic(const std::vector<std::string>& args);
-		void	commandTopic(Client *client);
 		void 	sendMessage(Client* sender, const std::string& message);
 
 	private:
