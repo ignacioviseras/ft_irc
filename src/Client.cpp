@@ -33,12 +33,12 @@ void Client::setNickname(const std::string &nickname) {
     _nickname = nickname;
 }
 
-void Client::setHostname(const std::string &hostname) {
-    _hostname = hostname;
+void Client::setMode(const std::string &mode) {
+    _mode = mode;
 }
 
-void Client::setServername(const std::string &servername) {
-    _servername = servername;
+void Client::setUnused(const std::string &unused) {
+    _unused = unused;
 }
 
 void Client::setRealname(const std::string &realname) {

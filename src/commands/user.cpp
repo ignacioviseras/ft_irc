@@ -1,18 +1,16 @@
 #include "../../include/Server.hpp"
 
 void Server::_user(Client* sender, const std::vector<std::string>& args) {
-	if (args.size() != 5) {
-		if (args.size() < 5) {
-			std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " USER :Not enough parameters";
-			send_message(sender->getFd(), errorMsg);
-		}
-		return;
+	std::cout << "args.size()" << args.size() << std::endl;
+	if (args.size() < 5) {
+		std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " USER :Not enough parameters 'USER <username> 0 *:<realname>'";
+		send_message(sender->getFd(), errorMsg);
 	}
 	std::string username = args[1];
-	std::string hostname = args[2];
-	std::string servername = args[3];
-	if (hostname != "0" && servername != "*"){
-		std::string errorMsg = ":irc.servidor.com **** " + sender->getNickname() + "Error in params param 3 0 and param 4 *";
+	std::string mode = args[2];
+	std::string unused = args[3];
+	if (mode != "0" && unused != "*"){
+		std::string errorMsg = ":irc.servidor.com **** " + sender->getNickname() + " Error in params param_3 -> 0 and param_4 -> *";
 		send_message(sender->getFd(), errorMsg);
 	}
 	std::string realname;
@@ -22,8 +20,8 @@ void Server::_user(Client* sender, const std::vector<std::string>& args) {
 	if (!realname.empty() && realname[0] == ':')
     	realname.erase(0, 1);
 	sender->setUsername(username);
-	sender->setHostname(hostname);
-	sender->setServername(servername);
+	sender->setMode(mode);
+	sender->setUnused(unused);
 	sender->setRealname(realname);
 	std::cout << "fd: " << sender->getFd() << " setuser okey" << std::endl;
 	checkRegistration(sender->getFd(), *sender);

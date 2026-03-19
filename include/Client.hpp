@@ -21,8 +21,8 @@ public:
 
     void setNickname(const std::string &nickname);
     void setUsername(const std::string &username);
-    void setHostname(const std::string &hostname);
-    void setServername(const std::string &servername);
+    void setMode(const std::string &mode);
+    void setUnused(const std::string &unused);
     void setRealname(const std::string &realname);
     std::string getNickname() const;
     std::string &getUsername();
@@ -34,8 +34,8 @@ private:
     std::string _writeBuffer;
     std::string _nickname;
     std::string _username;
-    std::string _hostname;
-    std::string _servername;
+    std::string _mode;
+    std::string _unused;
     std::string _realname;
 };
 
