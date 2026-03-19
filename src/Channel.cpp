@@ -76,6 +76,24 @@ std::string Channel::getKey() const {
 	return _key;
 }
 
+void Channel::setInviteMode(bool newmode) {
+    _inviteOnly = newmode;
+}
+
+void Channel::setOperatorTopic(bool newmode) {
+    _topicRestricted = newmode;
+}
+
+void Channel::setLimit(int newlimit) {
+    _channelLimit = newlimit;
+}
+
+
+void Channel::setKey(std::string newkey) {
+    _key = newkey; 
+}
+
+
 void Channel::sendToChannel(const std::string& message, Client* exclude) {
     const std::set<Client*>& users = this->getUsers();
     for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {

@@ -13,6 +13,7 @@ SRCS =	src/main.cpp \
 		src/commands/pass.cpp \
 		src/commands/part.cpp \
 		src/commands/join.cpp \
+		src/commands/mode.cpp \
 		src/commands/invite.cpp \
 		src/commands/topic.cpp \
 		src/commands/names.cpp \

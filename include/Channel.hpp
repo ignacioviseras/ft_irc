@@ -38,6 +38,11 @@ public:
 	    const std::set<Client*>& getInvited() const;
 		const std::set<Client*>& getUsers() const;
 
+		void setInviteMode(bool newmode);
+		void setKey(std::string newkey);
+		void setOperatorTopic(bool newmode);
+		void setLimit(int newlimit);
+
 		void sendToChannel(const std::string& message, Client* exclude);
 
 		//COMMANDS

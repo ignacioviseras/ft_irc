@@ -373,9 +373,9 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             break;
         }
         //--------- MODE -----------
-        // case Token::MODE:
-        // 	c->commandMode(args);
-        //     break;
+        case Token::MODE:
+            _mode(&user, args);
+            break;
 		case Token::QUIT: {
             _quit(&user, args);
 			break;
