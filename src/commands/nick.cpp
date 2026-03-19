@@ -18,7 +18,6 @@ void Server::_nick(int fd, const std::vector<std::string>& args) {
 	if (args.size() < 2 || args[1].empty()) {
 		std::string errorMsg = ":irc.servidor.com 431 " + user.getNickname() + " :No nickname given";
 		send_message(fd, errorMsg);
-		//send_message(fd, "Error: NICK necesita el nickname 'NICK <nickname>'");
 		return;
 	}
 	std::string nickName = args[1];

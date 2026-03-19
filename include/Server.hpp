@@ -21,7 +21,7 @@
 class Server
 {
     private:
-        int _port; //0 to 65535
+        int _port; //1023 to 65535
         std::string _password;
         bool _running;
         int _serverSocket;
@@ -65,17 +65,11 @@ class Server
 		void _nick(int fd, const std::vector<std::string>& args);
 		
 		void sendToChannel(const Channel& channel, const std::string& msg);
-		
 		Client* findClientByNick(const std::string& nick);
 		void disconnectClient(int fd);
-		
-		//mixi
-		
 		Channel* findChannel(const std::vector<std::string>& args);
 		void	commandList(int fd);
 		void	commandInvite(Client* sender, const std::vector<std::string>& args);
-
-
 	public:
         Server(int port, const std::string &password);
         ~Server();

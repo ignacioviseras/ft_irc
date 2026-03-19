@@ -76,6 +76,7 @@ void	Server::_kick(Client* sender, const std::vector<std::string>& args) {
         }
     }
 }
+//delete?
 	/* std::set<std::string> targetNicks;
 	for (size_t i = 2; i < args.size(); ++i) {
 		targetNicks.insert(args[i]);

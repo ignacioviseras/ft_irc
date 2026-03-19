@@ -83,7 +83,7 @@ void Server::run() {
 
             // manejo de errores o desconexiones
             if (events[i].events & (EPOLLERR | EPOLLHUP)) {
-                std::cout << "Error/HUP en FD " << fd << ": Desconectando......." << std::endl;
+                std::cout << "Error/HUP en FD " << fd << ": Disconnecting......." << std::endl;
                 disconnectClient(fd);
                 continue;
             }
@@ -98,7 +98,7 @@ void Server::run() {
                     handleClientData(fd);
             }
 
-            // manejo de escritura     solo si hay algo en el buffer del cliente
+            // manejo de escritura solo si hay algo en el buffer del cliente
             if (events[i].events & EPOLLOUT) {
                 handleClientWrite(fd);
             }
@@ -122,7 +122,7 @@ void Server::handleNewConnection() {
         return;
     }
 
-    std::cout << "Nuevo cliente: FD " << clientFd << std::endl;
+    std::cout << "New client: FD " << clientFd << std::endl;
     _clients.insert(std::make_pair(clientFd, Client(clientFd)));
     struct epoll_event ev;
     std::memset(&ev, 0, sizeof(ev));
@@ -141,7 +141,7 @@ void Server::handleStdin() {
         return;
     if (input == "EXIT") {
         _running = false;
-        std::cout << "Cerrando servidor..." << std::endl;
+        std::cout << "Closing server..." << std::endl;
     }
     if (input.empty())
         return;
@@ -152,6 +152,7 @@ void Server::handleStdin() {
 	if (!parse(input, args)) {
     	executeCommand(STDIN_FILENO, args);
 	}
+    //delete?
     //Token Token_test(Token_assign_type(split(input, " ")[0]), split(input, " "));
     //std::cout << "Token GENERADO - Tipo: " << Token_test.getType() << std::endl;
 }
@@ -392,6 +393,7 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             std::cout << "Ejecutando lógica de LIST..." << std::endl;
 			commandList(fd);
             break;
+        //delete?
         case Token::UNKNOWN:
 			//sea lo que sea la gestion que hay que hacer aqui.
 			break;
@@ -448,7 +450,6 @@ void Server::commandList(int fd)
         return;
 
     const Client &user = _clients[fd];
-
     std::string firstLine = ":irc.servidor.com 321 " + user.getNickname() + "Channel :Users Name";
     send_message(fd, firstLine);
     for (std::map<std::string, Channel>::const_iterator it = _channels.begin(); it != _channels.end(); ++it) {

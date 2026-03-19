@@ -73,6 +73,7 @@ void    Server::_modeOperator(const std::vector<std::string>& args)
 		if (args[3] == c->getUsername())
 			break ;
 	}
+    //delete?
 	// std::string userList = "";
     // for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
     //     if (!userList.empty())

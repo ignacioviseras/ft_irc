@@ -18,6 +18,7 @@ void	Server::_privMsg(Client* sender, const std::vector<std::string>& args) {
 	if (!message.empty())
 		message.erase(message.length() - 1);
 
+//delete?
 	// TODO: Esto no está repetido?
 	// El código de error es correcto?
 	if (!target.empty() && (target[0] == '#' || target.find('#') != std::string::npos)) {

@@ -1,7 +1,7 @@
 #include "../../include/Server.hpp"
 
 void Server::_quit(Client* sender, const std::vector<std::string>& args) {	
-	std::cout << "Ejecutando lógica de QUIT..." << std::endl;
+	std::cout << "Running QUIT logic..." << std::endl;
     int fd = sender->getFd();
     std::string reason = "";
     if (args.size() > 1) {
@@ -11,9 +11,10 @@ void Server::_quit(Client* sender, const std::vector<std::string>& args) {
         }
     }
 
+	//delete?
 	// Enviar mensaje de QUIT al cliente antes de cerrar la conexión
 	// Necesario???
-    std::string msg = "Adiós!!!";
+    std::string msg = "Bye!!!";
     if (!reason.empty()) msg += ": " + reason;
     send_message(fd, msg);
 
@@ -52,14 +53,7 @@ void Server::_quit(Client* sender, const std::vector<std::string>& args) {
 	}
 
 	// Cerrar la conexión del cliente y limpiar recursos
-	std::cout << "Cerrando conexión del cliente " << sender->getNickname() << " (fd: " << fd << ")" << std::endl;
-
-	// for (size_t i = 0; i < _pollfds.size(); ++i) {
-	//     if (_pollfds[i].fd == fd) {
-	//         _pollfds.erase(_pollfds.begin() + i);
-	//         break;
-	//     }
-	// }
+	std::cout << "Closing client connection " << sender->getNickname() << " (fd: " << fd << ")" << std::endl;
 	close(fd);
 	_clients.erase(fd);
 }

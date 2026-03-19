@@ -35,6 +35,7 @@ std::vector<std::string> split(const std::string& s, const std::string& delimite
 
 bool parse_commands(const std::string& input)
 {
+    //delete?
     // std::vector<std::string> splitted_input = split(input, " ");
     // for (size_t i = 0; i < splitted_input.size(); ++i)
     //     std::cout << "PARTE " << i << " : " << splitted_input[i] << std::endl;
@@ -50,6 +51,7 @@ bool parse_commands(const std::string& input)
         std::cout << "Error: Comando demasiado largo." << std::endl;
         return false;
     }
+    //delete?
     // int Token_size = splitted_input.size();
     // //esta comprobacion es 
     // if (Token_size > 4)
@@ -66,7 +68,7 @@ bool valid_server_port(const char *arg)
             return (false);
     }
     num = std::atoi(arg);
-    if (num > 65535)
+    if (num <= 1023 || num > 65535)
         return (false);
     return (true);
 }
@@ -174,6 +176,7 @@ std::string normalizeChannelName(const std::string& rawName)
 
     if (cleaned.empty())
         return cleaned;
+    //delete?
     /* if (cleaned[0] != '#')
         cleaned.insert(cleaned.begin(), '#'); */
     return cleaned;

@@ -5,6 +5,7 @@ void	Server::_topic(int fd, const std::vector<std::string>& args){
 	std::string top;
     Client& sender = _clients[fd];
 
+//delete?
     /* std::cout << "ENTRO EN COMMANDTOPIC" << std::endl;
     std::cout << "ARG SIZE: " << args.size() << std::endl;
     for (size_t i = 0; i < args.size(); ++i) {
