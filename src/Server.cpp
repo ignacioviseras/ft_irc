@@ -287,7 +287,7 @@ void Server::checkRegistration(int fd, Client &user) {
     }
 }
 
-Channel* Server::findChannel(const std::vector<std::string>& args)
+/* Channel* Server::findChannel(const std::vector<std::string>& args)
 {
     if (args.size() < 2) {
 		return NULL;
@@ -303,7 +303,7 @@ Channel* Server::findChannel(const std::vector<std::string>& args)
 	}
 	Channel& channel = it->second;
 	return (&channel);
-}
+} */
 
 void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     Token::type cmdType = Token_assign_type(args[0]);
@@ -375,9 +375,9 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
             break;
         }
         //--------- MODE -----------
-        // case Token::MODE:
-        // 	c->commandMode(args);
-        //     break;
+        case Token::MODE:
+            _mode(&user, args);
+            break;
 		case Token::QUIT: {
             _quit(&user, args);
 			break;
@@ -396,9 +396,6 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 			commandList(fd);
             break;
         //delete?
-        case Token::UNKNOWN:
-			//sea lo que sea la gestion que hay que hacer aqui.
-			break;
         default:
             std::cerr << "Unknown command: " << args[0] << std::endl;
             break;
@@ -436,7 +433,6 @@ void Server::disconnectClient(int fd) {
          chanIt != _channels.end(); ++chanIt) {
         if (chanIt->second.hasUser(client)) {
             chanIt->second.removeUser(client);
-            // Mark empty channels for removal
             if (chanIt->second.getUsers().empty()) {
                 channelsToRemove.push_back(chanIt->first);
             }
@@ -467,12 +463,10 @@ void Server::commandList(int fd)
         if (topic.empty() || topic == "There is no topic in the channel.")
             topic = "(no topic)";
 
-        // simple listing line; use numeric 322 (RPL_LIST) style
         std::string line = ":irc.servidor.com 322 " + user.getNickname() + " " + chanName + " :" + topic;
         send_message(fd, line);
     }
 
-    // end of list (numeric 323)
     std::string endLine = ":irc.servidor.com 323 " + user.getNickname() + " :End of /LIST";
     send_message(fd, endLine);
 }

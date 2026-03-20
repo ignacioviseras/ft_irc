@@ -1,7 +1,7 @@
 #include "../include/Channel.hpp"
 
 
-Channel::Channel(const std::string& name) : _name(name), _topic("default"),_inviteOnly(false), _topicRestricted(false), _channelLimit(-1) {}
+Channel::Channel(const std::string& name) : _name(name), _topic("default"), _keyLocked(false), _inviteOnly(false), _topicRestricted(false), _limitRestricted(false), _channelLimit(-1) {}
 
 Channel::~Channel() {}
 
@@ -68,6 +68,14 @@ bool Channel::getTopicMode() const {
     return _topicRestricted;
 }
 
+bool Channel::getLimitMode() const {
+    return _limitRestricted;
+}
+
+bool Channel::getKeyMode() const {
+    return _keyLocked;
+}
+
 int Channel::getChannelLimit() const {
 	return _channelLimit;
 }
@@ -75,6 +83,32 @@ int Channel::getChannelLimit() const {
 std::string Channel::getKey() const {
 	return _key;
 }
+
+void Channel::setInviteMode(bool newmode) {
+    _inviteOnly = newmode;
+}
+
+void Channel::setOperatorTopic(bool newmode) {
+    _topicRestricted = newmode;
+}
+
+void Channel::setKeyMode(bool newmode) {
+    _keyLocked = newmode;
+}
+
+void Channel::setLimitMode(bool newmode) {
+    _limitRestricted = newmode;
+}
+
+void Channel::setLimit(int newlimit) {
+    _channelLimit = newlimit;
+}
+
+
+void Channel::setKey(std::string newkey) {
+    _key = newkey; 
+}
+
 
 void Channel::sendToChannel(const std::string& message, Client* exclude) {
     const std::set<Client*>& users = this->getUsers();

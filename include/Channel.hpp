@@ -23,6 +23,9 @@ public:
 
 		bool getInviteMode(void) const;
 		bool getTopicMode(void) const;
+		bool getLimitMode(void) const;
+		bool getKeyMode(void) const;
+
 		int getChannelLimit(void) const;
 		std::string getKey(void) const; // or: const std::string& getKey() const;
 
@@ -37,6 +40,13 @@ public:
 	    const std::string& getName() const;
 	    const std::set<Client*>& getInvited() const;
 		const std::set<Client*>& getUsers() const;
+
+		void setInviteMode(bool newmode);
+		void setKey(std::string newkey);
+		void setOperatorTopic(bool newmode);
+		void setLimit(int newlimit);
+		void setKeyMode(bool newmode);
+		void setLimitMode(bool newmode);
 
 		void sendToChannel(const std::string& message, Client* exclude);
 
@@ -53,8 +63,10 @@ public:
 
 		std::string _topic;
 		std::string _key;
+		bool	_keyLocked;
 		bool	_inviteOnly;
 		bool	_topicRestricted;
+		bool	_limitRestricted;
 		int		_channelLimit;
 
 
