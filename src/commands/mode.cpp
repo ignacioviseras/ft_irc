@@ -103,6 +103,17 @@ void    Server::_modeOperator(const std::vector<std::string>& args, Channel *cha
 		return;
 	}
 	channel->setOperator(c, isAdding);
+	std::string userList = "";
+    for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
+        if (!userList.empty())
+			userList += " ";
+		if (channel->isOperator(*it2)) userList += "@";
+	}
+
+	for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
+        Client* c = *it2;
+        sendNames(c->getFd(), "irc.servidor.com", c->getNickname(), channel->getName(), userList);
+    }
 }
 
 void    Server::_modeLimit(const std::vector<std::string>& args, Channel *channel, bool isAdding)
