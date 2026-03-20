@@ -25,7 +25,8 @@ class Token
             NAMES,
             PRIVMSG, // para mensajes
             UNKNOWN, //se puede usar por si no existe y asi se tramita
-			LIST
+			LIST,
+            EXIT
         };
 
         Token();

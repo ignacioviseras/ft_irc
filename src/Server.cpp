@@ -152,9 +152,6 @@ void Server::handleStdin() {
 	if (!parse(input, args)) {
     	executeCommand(STDIN_FILENO, args);
 	}
-    //delete?
-    //Token Token_test(Token_assign_type(split(input, " ")[0]), split(input, " "));
-    //std::cout << "Token GENERADO - Tipo: " << Token_test.getType() << std::endl;
 }
 
 void Server::handleClientData(int fd) {
@@ -308,14 +305,12 @@ void Server::checkRegistration(int fd, Client &user) {
 void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     Token::type cmdType = Token_assign_type(args[0]);
 
-	int nbr = 0;
-    //delete??
-	for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it) {
-		std::cout << "ARG: " << nbr << " " << *it << std::endl;
-		nbr++;
-	}
-    //********
     Client& user = _clients[fd];
+    if (cmdType == Token::EXIT){
+        std::cout << "Client disconected FD = " << fd << std::endl;
+        disconnectClient(fd);
+        return;
+    }
     if (!user._isPasswordOk && cmdType != Token::PASS) {
         send_message(fd, ":irc.servidor.com 451 * :You have not registered PASS <passwd>.");
         return; 
@@ -393,7 +388,6 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 		case Token::LIST:
 			commandList(fd);
             break;
-        //delete?
         default:
             std::cerr << "Unknown command: " << args[0] << std::endl;
             break;
@@ -421,11 +415,6 @@ void Server::disconnectClient(int fd) {
     if (clientIt == _clients.end())
         return;
     Client* client = &clientIt->second;
-    if (!client->getBuffer().empty()) {
-        std::string leftover = client->getBuffer();
-        leftover += "\n"; 
-        handleCommand(fd, leftover);
-    }
     std::vector<std::string> channelsToRemove;
     for (std::map<std::string, Channel>::iterator chanIt = _channels.begin(); 
          chanIt != _channels.end(); ++chanIt) {
