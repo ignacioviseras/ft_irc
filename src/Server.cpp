@@ -284,24 +284,6 @@ void Server::checkRegistration(int fd, Client &user) {
     }
 }
 
-/* Channel* Server::findChannel(const std::vector<std::string>& args)
-{
-    if (args.size() < 2) {
-		return NULL;
-	}
-    std::string chanName = normalizeChannelName(args[1]);
-    if (!isValidChannelName(chanName)) {
-        return NULL;
-    }
-	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
-	if (it == _channels.end()) {
-		_channels.insert(std::make_pair(chanName, Channel(chanName)));
-		it = _channels.find(chanName);
-	}
-	Channel& channel = it->second;
-	return (&channel);
-} */
-
 void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     Token::type cmdType = Token_assign_type(args[0]);
 

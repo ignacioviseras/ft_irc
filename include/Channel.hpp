@@ -33,6 +33,7 @@ public:
 	    void addUser(Client* client);
 	    void removeUser(Client* client);
 	    bool hasUser(Client* client) const;
+
 	    bool isOperator(Client* client) const;
 		void setTopic(std::string top);
 		std::string getTopic() const;
