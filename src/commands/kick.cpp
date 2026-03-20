@@ -76,36 +76,3 @@ void	Server::_kick(Client* sender, const std::vector<std::string>& args) {
         }
     }
 }
-//delete?
-	/* std::set<std::string> targetNicks;
-	for (size_t i = 2; i < args.size(); ++i) {
-		targetNicks.insert(args[i]);
-	}
-
-	std::set<Client*> targets;
-	for (std::set<std::string>::const_iterator it = targetNicks.begin(); it != targetNicks.end(); ++it) {
-		Client* target = findClientByNick(*it);
-		if (target) {
-			targets.insert(target);
-		} else {
-			std::string errorMsg = ":irc.servidor.com 441 " + sender->getNickname() + " " + *it + " " + chanName + " :They aren't on that channel";
-			send_message(sender->getFd(), errorMsg);
-		}
-	}
-
-	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
-
-	Client* target = findClientByNick(targetNick);
-	std::map<std::string, Channel>::iterator it = _channels.find(chanName);
-	
-	// Enviar KICK a todos (incluyendo al expulsado) ANTES de removerlo
-	std::string kickMsg = ":" + sender->getNickname() + "!" + sender->getUsername() + "@irc.servidor.com KICK " + chanName + " " + targetNick;
-	sendToChannel(channel, kickMsg);
-	send_message(target->getFd(), kickMsg);
-	channel.removeUser(target);
-	send_message(sender->getFd(), "Usuario " + targetNick + " expulsado correctamente.");
-	if (channel.getUsers().empty()) {
-		_channels.erase(it);
-	}
-}
- */
