@@ -51,11 +51,11 @@ class Server
 		
 		void _topic(int fd, const std::vector<std::string>& args);
 		void _invite(Client* sender, const std::vector<std::string>& args);
-		void _modeInvite(Channel *channel);
-		void _modeKey(const std::vector<std::string>& args, Channel *channel);	
-		void _modeOperator(const std::vector<std::string>& args, Channel *channel);
-		void _modeLimit(const std::vector<std::string>& args, Channel *channel);
-		void _modeTopic(Channel *channel);
+		void _modeInvite(Channel *channel, bool isAdding);
+		void _modeKey(const std::vector<std::string>& args, Channel *channel, bool isAdding);	
+		void _modeOperator(const std::vector<std::string>& args, Channel *channel, bool isAdding);
+		void _modeLimit(const std::vector<std::string>& args, Channel *channel, bool isAdding);
+		void _modeTopic(Channel *channel, bool isAdding);
 		
 		void _mode(Client* sender, const std::vector<std::string>& args);
 		void _user(Client* sender, const std::vector<std::string>& args);

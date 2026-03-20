@@ -11,8 +11,8 @@ void   Server::_mode(Client *sender, const std::vector<std::string>& args)
 		send_message(sender->getFd(), errorMsg);
 		return;
 	}
-    if (args.size() == 2) {
-
+    if (args.size() == 2)
+    {
         std::string modes = "+";
         if (channel->getInviteMode())
             modes += "i"; 
@@ -26,89 +26,79 @@ void   Server::_mode(Client *sender, const std::vector<std::string>& args)
         send_message(sender->getFd(), errorMsg);
         return;
     }
-    char flag = args[2].at(0);
+    if ((args[3].at(0) != '+' && args[3].at(0) != '-') || args[3].length() < 2)
+    {
+        std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " :Unknown MODE flag";
+        send_message(sender->getFd(), errorMsg);
+        return;
+    }
+    char flag = args[3].at(1);
+    bool isAdding = args[3].at(0) == '+';
     switch (flag) {
         case 'i':
-			std::cout << "invite" << std::endl;
-           _modeInvite(channel);
+           _modeInvite(channel, isAdding);
             break;
         case 't':
-            _modeTopic(channel);
+            _modeTopic(channel, isAdding);
             break;
         case 'k':
-    		_modeKey(args, channel);
+    		_modeKey(args, channel, isAdding);
             break;
         case 'o':
-            _modeOperator(args, channel);
+            _modeOperator(args, channel, isAdding);
             break;
         case 'l':
-            _modeLimit(args, channel);
+            _modeLimit(args, channel, isAdding);
             break;
         default:
-            // Unknown flag
+            std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " :Unknown MODE flag";
+            send_message(sender->getFd(), errorMsg);
             break;
     }
 }
 
-void    Server::_modeInvite(Channel *channel)
+void    Server::_modeInvite(Channel *channel, bool isAdding)
 {
-    if (channel->getInviteMode() == true)
-        channel->setInviteMode(false);
-    else
-		channel->setInviteMode(true);
+    channel->setInviteMode(isAdding);
 	std::cout << "Canal restringido solo a invitaciones establecido en : " << channel->getInviteMode() << std::endl;
 }
 
-void    Server::_modeKey(const std::vector<std::string>& args, Channel *channel)
+void    Server::_modeKey(const std::vector<std::string>& args, Channel *channel, bool isAdding)
 {
+    channel->setKeyMode(isAdding);
 
-	//MUY SUJETO A CAMBIOS Y REVISION
-    if (args.size() == 4 && !args[3].empty()) {
+    if (args.size() == 4 && !args[3].empty())
+    {
         channel->setKey(args[3]);
     }
 	std::cout << "Clave para unirse al canal ahora vale : " << channel->getKey() << std::endl;
 
 }
 
-void    Server::_modeTopic(Channel *channel)
+void    Server::_modeTopic(Channel *channel, bool isAdding)
 {
-	if (channel->getTopicMode() == true)
-		channel->setOperatorTopic(false);
-	else
-		channel->setOperatorTopic(true);
+	channel->setOperatorTopic(isAdding);
 	std::cout << "Topic restringido solo a operadores establecido en : " << channel->getTopicMode() << std::endl;
 }
 
-void    Server::_modeOperator(const std::vector<std::string>& args, Channel *channel)
+void    Server::_modeOperator(const std::vector<std::string>& args, Channel *channel, bool isAdding)
 {
 	
 	const std::set<Client*>& users = channel-> getUsers();
 	Client* c = NULL;
-
-	//HAY QUE COMPROBAR MUCHAS COSAS AQUI COMO QUE SUCEDE SI NO ENCUENTRA UN USER COINCIDENTE
 	for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
 		c = *it;
 		if (args[3] == c->getUsername())
 			break ;
 	}
-    //delete?
-	// std::string userList = "";
-    // for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
-    //     if (!userList.empty())
-	// 		userList += " ";
-	// 	if (this->isOperator(*it2)) userList += "@"; // Añadir @ para operadores
-	// 	userList += (*it2)->getNickname();
-	// }
-	channel->setOperator(c, true);
-	std::cout << "Nuevo usuario asignado como operador : " << c->getUsername() << std::endl;
-
+	channel->setOperator(c, isAdding);
 }
 
-void    Server::_modeLimit(const std::vector<std::string>& args, Channel *channel)
+void    Server::_modeLimit(const std::vector<std::string>& args, Channel *channel, bool isAdding)
 {
     if (args.size() < 4 || args[3].empty())
         return;
-
+    channel->setLimitMode(isAdding);
     const char* s = args[3].c_str();
     char* end = NULL;
     errno = 0;

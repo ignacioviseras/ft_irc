@@ -42,6 +42,8 @@ public:
 		void setKey(std::string newkey);
 		void setOperatorTopic(bool newmode);
 		void setLimit(int newlimit);
+		void setKeyMode(bool newmode);
+		void setLimitMode(bool newmode);
 
 		void sendToChannel(const std::string& message, Client* exclude);
 
@@ -58,8 +60,10 @@ public:
 
 		std::string _topic;
 		std::string _key;
+		bool	_keyLocked;
 		bool	_inviteOnly;
 		bool	_topicRestricted;
+		bool	_limitRestricted;
 		int		_channelLimit;
 
 

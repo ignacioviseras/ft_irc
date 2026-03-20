@@ -84,6 +84,14 @@ void Channel::setOperatorTopic(bool newmode) {
     _topicRestricted = newmode;
 }
 
+void Channel::setKeyMode(bool newmode) {
+    _keyLocked = newmode;
+}
+
+void Channel::setLimitMode(bool newmode) {
+    _limitRestricted = newmode;
+}
+
 void Channel::setLimit(int newlimit) {
     _channelLimit = newlimit;
 }
