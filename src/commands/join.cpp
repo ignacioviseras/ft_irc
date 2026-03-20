@@ -1,5 +1,17 @@
 #include "../../include/Server.hpp"
 
+bool	Server::_letpass(std::string nickname, std::set<Client*> _invited)
+{
+    for (std::set<Client*>::const_iterator it = _invited.begin(); it != _invited.end(); ++it) {
+        Client* c = *it;
+        if (!c) continue;
+        if (c->getNickname() == nickname)
+            return true;
+    }
+    return false;
+}
+
+
 void	Server::_join(int fd, const std::vector<std::string>& args) {
 	if (args.size() < 2) {
         std::string errorMsg = ":irc.servidor.com 461 " + _clients[fd].getNickname() + " JOIN :Not enough parameters";
@@ -38,14 +50,13 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
 
 		//MODE I
 
-		if (channel.getInviteMode())
+		if (channel.getInviteMode() && !_letpass(user.getNickname(), channel.getInvited()))
 		{
-			//NO SE CUAL ES EL ERROR DE ESTO
-			std::string errorMsg = ":irc.servidor.com 443 " + user.getNickname() + " " + chanName + " :is already on channel";
+			std::string errorMsg = ":irc.servidor.com 473 " + user.getNickname() + " " + chanName + " :Cannot join channel (+i)";
     	    send_message(fd, errorMsg);
 			continue;
 		}
-
+		//MODE L
 		int limit = channel.getChannelLimit();
 		size_t userCount = channel.getUsers().size();
 		if (limit > 0 && userCount >= static_cast<size_t>(limit))
@@ -62,8 +73,7 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
 
 		if (!channel.getKey().empty() && providedKey != channel.getKey())
 		{
-			//NO SE CUAL ES EL ERROR DE ESTO
-			std::string errorMsg = ":irc.servidor.com 443 " + user.getNickname() + " " + chanName + " :is already on channel";
+			std::string errorMsg = ":irc.servidor.com 475 " + user.getNickname() + " " + chanName + " :Cannot join channel (+k)";
     	    send_message(fd, errorMsg);
 			continue;
 		}

@@ -64,6 +64,9 @@ class Server
 		void _part(Client* sender, const std::vector<std::string>& args);
 		void _nick(int fd, const std::vector<std::string>& args);
 		
+		bool _letpass(std::string nickname, std::set<Client*> _invited);
+
+
 		void sendToChannel(const Channel& channel, const std::string& msg);
 		Client* findClientByNick(const std::string& nick);
 		void disconnectClient(int fd);
