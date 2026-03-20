@@ -1,12 +1,6 @@
 #include "../include/Server.hpp"
 #include "../include/Utils.hpp"
 
-//delete?
-void create_Token()
-{
-    
-}
-
 int main(int argc, char** argv) {
     if (argc != 3) {
         std::cerr << "Error: Correct use: ./ircserv <port> <password>" << std::endl;

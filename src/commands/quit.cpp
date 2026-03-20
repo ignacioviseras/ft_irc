@@ -10,10 +10,6 @@ void Server::_quit(Client* sender, const std::vector<std::string>& args) {
             reason += args[i];
         }
     }
-
-	//delete?
-	// Enviar mensaje de QUIT al cliente antes de cerrar la conexión
-	// Necesario???
     std::string msg = "Bye!!!";
     if (!reason.empty()) msg += ": " + reason;
     send_message(fd, msg);
