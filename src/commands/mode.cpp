@@ -94,14 +94,16 @@ void    Server::_modeOperator(const std::vector<std::string>& args, Channel *cha
 		send_message(sender->getFd(), errorMsg);
 		return;
 	}
-	const std::set<Client*>& users = channel->getUsers();
-	Client* c = NULL;
-	for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
-		c = *it;
-		if (args[3] == c->getNickname())
-			break ;
-	}
-	if (c == NULL || args[3] != c->getNickname())
+    const std::set<Client*>& users = channel->getUsers();
+    Client* c = NULL;
+    for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+        Client* tmp = *it;
+        if (args[3] == tmp->getNickname()) {
+            c = tmp;
+            break;
+        }
+    }
+    if (c == NULL)
 	{
 		std::string errorMsg = ":irc.servidor.com 441 " + args[3] + " " + channel->getName() + " :They aren't on that channel";
 		send_message(sender->getFd(), errorMsg);
@@ -110,10 +112,12 @@ void    Server::_modeOperator(const std::vector<std::string>& args, Channel *cha
 	channel->setOperator(c, isAdding);
 	std::string userList = "";
     for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
+        Client* u = *it2;
         if (!userList.empty())
-			userList += " ";
-		if (channel->isOperator(*it2)) userList += "@";
-	}
+            userList += " ";
+        if (channel->isOperator(u)) userList += "@";
+        userList += u->getNickname();
+    }
 
 	for (std::set<Client*>::const_iterator it2 = users.begin(); it2 != users.end(); ++it2) {
         Client* c = *it2;

@@ -24,13 +24,21 @@ void	Server::_topic(int fd, const std::vector<std::string>& args){
     	return;
     }
     Channel& channel = it->second;
-
+	if (!channel.hasUser(&sender)) {
+        std::string line = ":irc.servidor.com 442 " + sender.getNickname() + " " + channel.getName() + " :You're not on that channel";
+        send_message(sender.getFd(), line);
+        return;
+    }
     if (args.size() == 2) {
         std::string toPrint = channel.getTopic();
+		if (toPrint.empty()) {
+			toPrint = ":irc.servidor.com 331 " + sender.getNickname() + " " + channel.getName() + " :No topic is set";
+		} else {
+			toPrint = ":irc.servidor.com 332 " + sender.getNickname() + " " + channel.getName() + " :" + toPrint;
+		}
         send_message(fd, toPrint);
         return;
     }
-    
     if (channel.getTopicMode() && !channel.isOperator(&sender)) {
         std::string errorMsg = ":irc.servidor.com 482 " + sender.getNickname() + " " + channel.getName() + " :You're not channel operator";
         send_message(fd, errorMsg);

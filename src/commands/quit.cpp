@@ -52,8 +52,9 @@ void Server::_quit(Client* sender, const std::vector<std::string>& args) {
 		}
 	}
 
-	// Cerrar la conexión del cliente y limpiar recursos
 	std::cout << "Closing client connection " << sender->getNickname() << " (fd: " << fd << ")" << std::endl;
-	close(fd);
+
 	_clients.erase(fd);
+	shutdown(fd, SHUT_RDWR);
+	close(fd);
 }
