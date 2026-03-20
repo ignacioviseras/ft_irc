@@ -46,10 +46,9 @@ void	Server::_join(int fd, const std::vector<std::string>& args) {
 			continue;
 		}
 
-		// MODE L: enforce channel limit (limit < 0 means no limit)
 		int limit = channel.getChannelLimit();
 		size_t userCount = channel.getUsers().size();
-		if (limit >= 0 && userCount >= static_cast<size_t>(limit))
+		if (limit > 0 && userCount >= static_cast<size_t>(limit))
 		{
 			std::string errorMsg = ":irc.servidor.com 471 " + user.getNickname() + " " + chanName + " :Channel is full";
 			send_message(fd, errorMsg);

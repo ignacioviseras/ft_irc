@@ -1,7 +1,7 @@
 #include "../include/Channel.hpp"
 
 
-Channel::Channel(const std::string& name) : _name(name), _topic("default"),_inviteOnly(false), _topicRestricted(false), _channelLimit(-1) {}
+Channel::Channel(const std::string& name) : _name(name), _topic("default"), _keyLocked(false), _inviteOnly(false), _topicRestricted(false), _limitRestricted(false), _channelLimit(-1) {}
 
 Channel::~Channel() {}
 
@@ -66,6 +66,14 @@ bool Channel::getInviteMode() const {
 
 bool Channel::getTopicMode() const {
     return _topicRestricted;
+}
+
+bool Channel::getLimitMode() const {
+    return _limitRestricted;
+}
+
+bool Channel::getKeyMode() const {
+    return _keyLocked;
 }
 
 int Channel::getChannelLimit() const {

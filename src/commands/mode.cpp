@@ -4,25 +4,34 @@
 void   Server::_mode(Client *sender, const std::vector<std::string>& args)
 {
 
-    Channel* channel = findChannel(args);
-	if (!channel)
-	{
-        std::string errorMsg = ":irc.servidor.com 403 " + sender->getNickname() + " " + args[1] + " :No such channel";
+	if (args.size() == 1) {
+		std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " MODE :Not enough parameters";
 		send_message(sender->getFd(), errorMsg);
 		return;
 	}
+
+    std::map<std::string, Channel>::iterator it = _channels.find(args[1]);
+    if (it == _channels.end()) {
+    	std::string errorMsg = ":irc.servidor.com 403 " + sender->getNickname() + " " + args[1] + " :No such channel";
+    	send_message(sender->getFd(), errorMsg);
+    	return;
+    }
+    Channel& channel = it->second;
+
     if (args.size() == 2)
     {
-        std::string modes = "+";
-        if (channel->getInviteMode())
+        std::string modes = " +";
+        if (channel.getInviteMode())
             modes += "i"; 
-        if (channel->getTopicMode())
+        if (channel.getTopicMode())
             modes += "t";
-        if (!channel->getKey().empty())
+        if (channel.getKeyMode())
             modes += "k";
-        if (channel->getChannelLimit() > 0)
+        if (channel.getLimitMode())
             modes += "l";
-        std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " NAMES :Not enough parameters";
+		if (modes.size() == 2)
+			modes = "";
+        std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " " + channel.getName() + modes;
         send_message(sender->getFd(), errorMsg);
         return;
     }
@@ -36,19 +45,19 @@ void   Server::_mode(Client *sender, const std::vector<std::string>& args)
     bool isAdding = args[3].at(0) == '+';
     switch (flag) {
         case 'i':
-           _modeInvite(channel, isAdding);
+           _modeInvite(&channel, isAdding);
             break;
         case 't':
-            _modeTopic(channel, isAdding);
+            _modeTopic(&channel, isAdding);
             break;
         case 'k':
-    		_modeKey(args, channel, isAdding);
+    		_modeKey(args, &channel, isAdding);
             break;
         case 'o':
-            _modeOperator(args, channel, isAdding);
+            _modeOperator(args, &channel, isAdding, sender);
             break;
         case 'l':
-            _modeLimit(args, channel, isAdding);
+            _modeLimit(args, &channel, isAdding);
             break;
         default:
             std::string errorMsg = ":irc.servidor.com 461 " + sender->getNickname() + " :Unknown MODE flag";
@@ -60,7 +69,6 @@ void   Server::_mode(Client *sender, const std::vector<std::string>& args)
 void    Server::_modeInvite(Channel *channel, bool isAdding)
 {
     channel->setInviteMode(isAdding);
-	std::cout << "Canal restringido solo a invitaciones establecido en : " << channel->getInviteMode() << std::endl;
 }
 
 void    Server::_modeKey(const std::vector<std::string>& args, Channel *channel, bool isAdding)
@@ -71,17 +79,14 @@ void    Server::_modeKey(const std::vector<std::string>& args, Channel *channel,
     {
         channel->setKey(args[3]);
     }
-	std::cout << "Clave para unirse al canal ahora vale : " << channel->getKey() << std::endl;
-
 }
 
 void    Server::_modeTopic(Channel *channel, bool isAdding)
 {
 	channel->setOperatorTopic(isAdding);
-	std::cout << "Topic restringido solo a operadores establecido en : " << channel->getTopicMode() << std::endl;
 }
 
-void    Server::_modeOperator(const std::vector<std::string>& args, Channel *channel, bool isAdding)
+void    Server::_modeOperator(const std::vector<std::string>& args, Channel *channel, bool isAdding, Client *sender)
 {
 	
 	const std::set<Client*>& users = channel-> getUsers();
@@ -90,6 +95,12 @@ void    Server::_modeOperator(const std::vector<std::string>& args, Channel *cha
 		c = *it;
 		if (args[3] == c->getUsername())
 			break ;
+	}
+	if (c == NULL || args[3] != c->getUsername())
+	{
+		std::string errorMsg = ":irc.servidor.com 441 " + args[3] + " " + channel->getName() + " :They aren't on that channel";
+		send_message(sender->getFd(), errorMsg);
+		return;
 	}
 	channel->setOperator(c, isAdding);
 }
@@ -111,5 +122,4 @@ void    Server::_modeLimit(const std::vector<std::string>& args, Channel *channe
         return;
 
     channel->setLimit(static_cast<int>(val));
-	std::cout << "Limite del canal establecido en : " << channel->getChannelLimit() << std::endl;
 }

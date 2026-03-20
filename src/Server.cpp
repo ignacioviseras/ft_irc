@@ -287,7 +287,7 @@ void Server::checkRegistration(int fd, Client &user) {
     }
 }
 
-Channel* Server::findChannel(const std::vector<std::string>& args)
+/* Channel* Server::findChannel(const std::vector<std::string>& args)
 {
     if (args.size() < 2) {
 		return NULL;
@@ -303,7 +303,7 @@ Channel* Server::findChannel(const std::vector<std::string>& args)
 	}
 	Channel& channel = it->second;
 	return (&channel);
-}
+} */
 
 void Server::executeCommand(int fd, const std::vector<std::string>& args) {
     Token::type cmdType = Token_assign_type(args[0]);

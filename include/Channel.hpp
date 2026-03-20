@@ -23,6 +23,9 @@ public:
 
 		bool getInviteMode(void) const;
 		bool getTopicMode(void) const;
+		bool getLimitMode(void) const;
+		bool getKeyMode(void) const;
+
 		int getChannelLimit(void) const;
 		std::string getKey(void) const; // or: const std::string& getKey() const;
 
