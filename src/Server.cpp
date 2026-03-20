@@ -394,9 +394,6 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
 			commandList(fd);
             break;
         //delete?
-        case Token::UNKNOWN:
-			//sea lo que sea la gestion que hay que hacer aqui.
-			break;
         default:
             std::cerr << "Comando desconocido: " << args[0] << std::endl;
             break;
@@ -429,7 +426,6 @@ void Server::disconnectClient(int fd) {
          chanIt != _channels.end(); ++chanIt) {
         if (chanIt->second.hasUser(client)) {
             chanIt->second.removeUser(client);
-            // Mark empty channels for removal
             if (chanIt->second.getUsers().empty()) {
                 channelsToRemove.push_back(chanIt->first);
             }
@@ -460,12 +456,10 @@ void Server::commandList(int fd)
         if (topic.empty() || topic == "There is no topic in the channel.")
             topic = "(no topic)";
 
-        // simple listing line; use numeric 322 (RPL_LIST) style
         std::string line = ":irc.servidor.com 322 " + user.getNickname() + " " + chanName + " :" + topic;
         send_message(fd, line);
     }
 
-    // end of list (numeric 323)
     std::string endLine = ":irc.servidor.com 323 " + user.getNickname() + " :End of /LIST";
     send_message(fd, endLine);
 }
