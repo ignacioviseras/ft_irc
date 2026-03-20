@@ -388,11 +388,9 @@ void Server::executeCommand(int fd, const std::vector<std::string>& args) {
         }
         //--------- PRIVMSG -----------
         case Token::PRIVMSG:
-            std::cout << "Ejecutando lógica de PRIVMSG..." << std::endl;
 			_privMsg(&user, args);
             break;
 		case Token::LIST:
-            std::cout << "Ejecutando lógica de LIST..." << std::endl;
 			commandList(fd);
             break;
         //delete?
