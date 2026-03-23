@@ -395,17 +395,34 @@ void Server::disconnectClient(int fd) {
     std::map<int, Client>::iterator clientIt = _clients.find(fd);
     if (clientIt == _clients.end())
         return;
+
     Client* client = &clientIt->second;
+    std::set<Client*> recipients;
     std::vector<std::string> channelsToRemove;
+
+    std::string nickname = client->getNickname().empty() ? "*" : client->getNickname();
+    std::string username = client->getUsername().empty() ? "unknown" : client->getUsername();
+    std::string quitMsg = ":" + nickname + "!" + username + "@irc.servidor.com QUIT :Connection closed";
+
     for (std::map<std::string, Channel>::iterator chanIt = _channels.begin(); 
          chanIt != _channels.end(); ++chanIt) {
         if (chanIt->second.hasUser(client)) {
+            const std::set<Client*>& users = chanIt->second.getUsers();
+            for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+                if (*it != client)
+                    recipients.insert(*it);
+            }
             chanIt->second.removeUser(client);
             if (chanIt->second.getUsers().empty()) {
                 channelsToRemove.push_back(chanIt->first);
             }
         }
     }
+
+    for (std::set<Client*>::const_iterator it = recipients.begin(); it != recipients.end(); ++it) {
+        send_message((*it)->getFd(), quitMsg);
+    }
+
     for (std::vector<std::string>::iterator it = channelsToRemove.begin(); 
          it != channelsToRemove.end(); ++it) {
         _channels.erase(*it);
