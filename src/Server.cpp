@@ -67,7 +67,7 @@ void Server::setupServerSocket() {
         perror("epoll_ctl: stdin");
     }
 
-    std::cout << "Servidor IRC con epoll iniciado en puerto " << _port << std::endl;
+    std::cout << "IRC server with epoll started on port " << _port << std::endl;
 }
 
 void Server::run() {
@@ -111,7 +111,6 @@ void Server::handleNewConnection() {
     socklen_t addrSize = sizeof(clientAddr);
 
     int clientFd = accept(_serverSocket, (sockaddr *)&clientAddr, &addrSize);
-    // Si un recv o un send se bloquea congelas todo el servidor para todos los usuarios
     if (clientFd < 0) {
         perror("accept()");
         return;
