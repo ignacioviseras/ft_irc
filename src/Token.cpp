@@ -1,5 +1,4 @@
-#include "Ircserv.hpp"
-#include "Token.hpp"
+#include "../include/Token.hpp"
 
 Token::Token()
 {
@@ -50,5 +49,3 @@ Token::type Token::getType() const {
 void Token::setType(type t) {
     _type = t;
 }
-
-

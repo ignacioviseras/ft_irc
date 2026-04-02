@@ -1,0 +1,122 @@
+#include "../include/Channel.hpp"
+
+
+Channel::Channel(const std::string& name) : _name(name), _topic("default"), _keyLocked(false), _inviteOnly(false), _topicRestricted(false), _limitRestricted(false), _channelLimit(-1) {}
+
+Channel::~Channel() {}
+
+void Channel::addUser(Client* client) {
+    _users.insert(client);
+}
+
+
+void Channel::addInvited(Client* client) {
+    _invited.insert(client);
+}
+
+void Channel::removeUser(Client* client) {
+    _users.erase(client);
+    _operators.erase(client);
+}
+
+bool Channel::hasUser(Client* client) const {
+    return _users.count(client) > 0;
+}
+
+bool Channel::isOperator(Client* client) const {
+    return _operators.count(client) > 0;
+}
+
+void Channel::setOperator(Client* client, bool op) {
+    if (op) {
+        _operators.insert(client);
+    } else {
+        _operators.erase(client);
+    }
+}
+
+void    Channel::setTopic(std::string top){
+    _topic = top;
+}
+
+std::string Channel::getTopic() const {
+    if (_topic.empty())
+        return "There is no topic in the channel.";
+    return _topic;
+}
+
+const std::string& Channel::getName() const {
+    return _name;
+}
+
+const std::set<Client*>& Channel::getUsers() const {
+    return _users;
+}
+
+
+const std::set<Client*>& Channel::getInvited() const {
+    return _invited;
+}
+
+//mode getters
+
+bool Channel::getInviteMode() const {
+    return _inviteOnly;
+}
+
+bool Channel::getTopicMode() const {
+    return _topicRestricted;
+}
+
+bool Channel::getLimitMode() const {
+    return _limitRestricted;
+}
+
+bool Channel::getKeyMode() const {
+    return _keyLocked;
+}
+
+int Channel::getChannelLimit() const {
+	return _channelLimit;
+}
+
+std::string Channel::getKey() const {
+	return _key;
+}
+
+void Channel::setInviteMode(bool newmode) {
+    _inviteOnly = newmode;
+}
+
+void Channel::setOperatorTopic(bool newmode) {
+    _topicRestricted = newmode;
+}
+
+void Channel::setKeyMode(bool newmode) {
+    _keyLocked = newmode;
+}
+
+void Channel::setLimitMode(bool newmode) {
+    _limitRestricted = newmode;
+}
+
+void Channel::setLimit(int newlimit) {
+    _channelLimit = newlimit;
+}
+
+
+void Channel::setKey(std::string newkey) {
+    _key = newkey; 
+}
+
+
+void Channel::sendToChannel(const std::string& message, Client* exclude) {
+    const std::set<Client*>& users = this->getUsers();
+    for (std::set<Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+        Client* c = *it;
+        if (exclude && c == exclude)
+            continue;
+        std::string full = message + "\r\n";
+        send(c->getFd(), full.c_str(), full.length(), 0);
+    }
+}

@@ -1,19 +1,32 @@
 #ifndef TOKEN_HPP
 # define TOKEN_HPP
 
-# include "Ircserv.hpp"
+# include <vector>
+# include <string>
+# include <iostream>
+
 
 class Token
 {
 
     public:
 
-        enum type
-        {
+        enum type {
+            USER, //auth
+            NICK, //auth
+            PASS, //auth
+			PART, //para salir de un canal
+			QUIT, //para desconectar
+            JOIN,
             KICK,
             INVITE,
             TOPIC,
-            MODE 
+            MODE,
+            NAMES,
+            PRIVMSG, // para mensajes
+            UNKNOWN, //se puede usar por si no existe y asi se tramita
+			LIST,
+            EXIT
         };
 
         Token();

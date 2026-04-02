@@ -1,0 +1,42 @@
+# ########################################################################### #
+# Vamos a escribir todo lo que tenemos pendiente.                             #              
+#                                                                             #      
+# Propongo que todo lo que esté hecho lo comprobemos con HexChat (cliente de  #
+# referencia) y nc, poner un ✅ cada vez que verifiquemos que algo funcione. #
+# #############################################################################
+
+
+COMANDOS
+
+- PASS = HexChat✅ Netcat✅
+- USER = HexChat✅ Netcat✅
+- NICK = HexChat✅ Netcat✅
+- PRIVMSG = HexChat✅ Netcat ✅
+- JOIN
+	- Revisar códigos de error de los modos.
+- INVITE = ❌
+- TOPIC
+	- Comprobar cómo imprime la información. Hay que enviarlo al sender. Revisarlo con params.
+- KICK = HexChat(Echar a un cliente desde fuera del canal no va?) Netcat ✅
+- PART = [:\<mensaje>]
+- MODE:
+	- i = HexChat✅
+	- t = HexChat✅
+	- k = HexChat✅
+	- o = HexChat✅
+	- l = HexChat✅
+- NAMES = HexChat✅ Netcat ✅
+- QUIT = [:\<mensaje>]
+
+
+
+
+
+
+
+
+EXTRAS
+
+Asegurarse de que el /join posee una modalidad para acceso con contraseña
+Todo lo que tiene que ver con contraseñas
+/join comprueba que un canal sea invite only o no
